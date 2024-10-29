@@ -5,19 +5,19 @@ import Data.Population;
 
 public class SelectionOperator {
     public Chromosome select(Population population) {
-        // Basic roulette wheel selection based on fitness
         int totalFitness = population.getTotalFitness();
         int randomValue = (int) (Math.random() * totalFitness);
 
-        int runningSum = 0;
+        int cumulativeFitness = 0;
         for (Chromosome chromosome : population.getChromosomes()) {
-            runningSum += chromosome.getFitness();
-            if (runningSum >= randomValue) {
+            cumulativeFitness += chromosome.getFitness();
+            if (cumulativeFitness >= randomValue) {
                 return chromosome;
             }
         }
 
-        return population.getChromosomes().get(0); // Fallback
+        // Return the first chromosome as a fallback (should rarely happen)
+        return population.getChromosomes().get(0);
     }
 }
 

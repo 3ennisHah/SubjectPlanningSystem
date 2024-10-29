@@ -27,4 +27,8 @@ public class Chromosome {
     public String toString() {
         return subjects.toString();
     }
+
+    public void hasCompletedSubject(String prerequisite) {
+        return;
+    }
 }
