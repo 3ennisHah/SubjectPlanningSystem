@@ -1,0 +1,107 @@
+    <!DOCTYPE html>
+    <html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <title>Drag and Drop Page</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+    <h1>Drag and Drop Example</h1>
+    
+    <!-- Edit Button -->
+    <button class="edit-btn" id="edit-btn">Edit Mode</button>
+    
+    <!-- Edit Panel -->
+    <div class="edit-panel" id="edit-panel">
+        <button id="add-block">Add Block</button>
+        <button id="rename-block">Rename Block</button>
+        <button id="change-color">Change Block Color</button>
+        <button id="change-border-color">Change Border Color</button>
+    </div>
+    
+    <!-- Modal (custom window for renaming, color change, etc.) -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <p id="modal-title"></p>
+            <input type="text" id="modal-input" placeholder="Enter value">
+            <button id="modal-confirm">Confirm</button>
+            <button id="modal-cancel">Cancel</button>
+        </div>
+    </div>
+    
+    <!-- Context Menu -->
+    <div class="context-menu" id="context-menu">
+        <ul>
+            <li id="rename-btn">Rename</li>
+            <li id="remove-btn">Remove</li>
+            <li id="insert-subject-btn">Insert Subject</li>
+        </ul>
+    </div>
+    
+    <!-- Rename Modal -->
+    <div id="rename-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span id="close-modal" class="close">&times;</span>
+            <h2>Rename Block</h2>
+            <input type="text" id="rename-input" placeholder="Enter new name" />
+            <button id="rename-confirm">Rename</button>
+            <button id="rename-cancel">Cancel</button>
+        </div>
+    </div>
+    
+    <!-- Subject Dropdown -->
+    <select id="subject-dropdown" style="display: none;">
+        <option value="">Select Subject</option>
+        <option value="Mathematics">Mathematics</option>
+        <option value="Physics">Physics</option>
+        <option value="Chemistry">Chemistry</option>
+        <option value="Biology">Biology</option>
+        <option value="Computer Science">Computer Science</option>
+        <option value="History">History</option>
+        <option value="Geography">Geography</option>
+    </select>
+    
+    <div id="drag-container">
+        <!-- Add columns for each semester -->
+        <div class="column" id="column1" data-column="1">
+            <div class="draggable free-elective" id="item1" draggable="true">Free elective 101</div>
+            <div class="draggable free-elective" id="item2" draggable="true">Free elective 102</div>
+            <div class="draggable" id="item3" draggable="true">Science 103</div>
+        </div>
+        <div class="column" id="column2" data-column="2">
+            <div class="draggable" id="item4" draggable="true">History 201</div>
+            <div class="draggable" id="item5" draggable="true">Geography 202</div>
+        </div>
+        <div class="column" id="column3" data-column="3">
+            <div class="draggable" id="item6" draggable="true">Computer Science 301</div>
+            <div class="draggable" id="item7" draggable="true">Biology 302</div>
+        </div>
+        <div class="column" id="column4" data-column="4">
+            <div class="draggable" id="item8" draggable="true">Physics 401</div>
+            <div class="draggable" id="item9" draggable="true">Chemistry 402</div>
+        </div>
+        <div class="column" id="column5" data-column="5">
+            <div class="draggable" id="item10" draggable="true">Economics 501</div>
+            <div class="draggable" id="item11" draggable="true">Business 502</div>
+        </div>
+        <div class="column" id="column6" data-column="6">
+            <div class="draggable" id="item12" draggable="true">Math 601</div>
+            <div class="draggable" id="item13" draggable="true">Statistics 602</div>
+        </div>
+        <div class="column" id="column7" data-column="7">
+            <div class="draggable" id="item14" draggable="true">Computer Networks 701</div>
+            <div class="draggable" id="item15" draggable="true">Database Systems 702</div>
+        </div>
+        <div class="column" id="column8" data-column="8">
+            <div class="draggable" id="item16" draggable="true">Artificial Intelligence 801</div>
+        <div class="draggable" id="item17" draggable="true">Machine Learning 802</div>
+    </div>
+    <div class="column" id="column9" data-column="9">
+        <div class="draggable" id="item18" draggable="true">Data Science 901</div>
+        <div class="draggable" id="item19" draggable="true">Cybersecurity 902</div>
+    </div>
+    </div>
+    
+    <script src="script.js"></script>
+    </body>
+    </html>
