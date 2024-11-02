@@ -5,15 +5,16 @@ public class Subject {
     private String subjectName;
     private int creditHours;
     private String[] prerequisites;
+    private boolean isCore;
 
-    public Subject(String subjectCode, String subjectName, int creditHours, String[] prerequisites) {
+    public Subject(String subjectCode, String subjectName, int creditHours, String[] prerequisites, boolean isCore) {
         this.subjectCode = subjectCode;
         this.subjectName = subjectName;
         this.creditHours = creditHours;
         this.prerequisites = prerequisites;
+        this.isCore = isCore;
     }
 
-    // Getters and setters
     public String getSubjectCode() {
         return subjectCode;
     }
@@ -30,13 +31,13 @@ public class Subject {
         return prerequisites;
     }
 
-    public boolean hasPrerequisite(String subjectCode) {
-        for (String prerequisite : prerequisites) {
-            if (prerequisite.equals(subjectCode)) {
-                return true;
-            }
-        }
-        return false;
+    public boolean isCoreSubject() {
+        return isCore;
+    }
+
+    @Override
+    public String toString() {
+        return subjectName + " (" + subjectCode + ")";
     }
 }
 

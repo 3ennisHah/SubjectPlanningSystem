@@ -1,5 +1,6 @@
 package Data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Student {
@@ -11,9 +12,10 @@ public class Student {
     public Student(String studentId, String name) {
         this.studentId = studentId;
         this.name = name;
+        this.completedSubjects = new ArrayList<>();
+        this.enrolledSubjects = new ArrayList<>();
     }
 
-    // Getters and setters
     public String getStudentId() {
         return studentId;
     }
@@ -36,6 +38,10 @@ public class Student {
 
     public void addEnrolledSubject(Subject subject) {
         enrolledSubjects.add(subject);
+    }
+
+    public boolean hasCompleted(String subjectCode) {
+        return completedSubjects.stream().anyMatch(subject -> subject.getSubjectCode().equals(subjectCode));
     }
 }
 

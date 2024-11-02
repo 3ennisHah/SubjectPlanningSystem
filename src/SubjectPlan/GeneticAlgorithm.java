@@ -8,6 +8,9 @@ import Operators.FitnessFunction;
 import Operators.MutationOperator;
 import Operators.SelectionOperator;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class GeneticAlgorithm {
     private SelectionOperator selectionOperator;
     private CrossoverOperator crossoverOperator;
@@ -21,28 +24,30 @@ public class GeneticAlgorithm {
         this.fitnessFunction = new FitnessFunction();
     }
 
-    public Population initializePopulation(Student student) {
-        // Initialize a population based on the student's current status
-        return new Population(student);
+    public Population initializePopulation(List<Chromosome> initialChromosomes) {
+        Population population = new Population(initialChromosomes);
+        for (Chromosome chromosome : population.getChromosomes()) {
+            fitnessFunction.calculateFitness(chromosome);
+        }
+        return population;
     }
 
     public Chromosome evolve(Population population) {
-        for (int i = 0; i < 100; i++) {  // Run for a fixed number of generations
-            // Selection
-            Chromosome parent1 = selectionOperator.select(population);
-            Chromosome parent2 = selectionOperator.select(population);
+        for (int i = 0; i < 100; i++) {  // Set to 100 generations
+            List<Chromosome> newChromosomes = new ArrayList<>();
 
-            // Crossover
-            Chromosome child = crossoverOperator.crossover(parent1, parent2);
+            for (int j = 0; j < population.getChromosomes().size(); j++) {
+                Chromosome parent1 = selectionOperator.select(population);
+                Chromosome parent2 = selectionOperator.select(population);
 
-            // Mutation
-            mutationOperator.mutate(child);
+                Chromosome child = crossoverOperator.crossover(parent1, parent2);
+                mutationOperator.mutate(child);
+                fitnessFunction.calculateFitness(child);
 
-            // Add child back into the population
-            population.addChromosome(child);
+                newChromosomes.add(child);
+            }
+            population = new Population(newChromosomes);
         }
-
-        // Return the best chromosome (solution) found
         return population.getFittest();
     }
 }

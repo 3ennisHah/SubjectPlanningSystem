@@ -11,6 +11,7 @@ public class FitnessFunction {
             fitness += evaluateSubject(subject, chromosome);
         }
 
+        // Set the calculated fitness score in the chromosome
         chromosome.setFitness(fitness);
         return fitness;
     }
@@ -18,14 +19,25 @@ public class FitnessFunction {
     private int evaluateSubject(Subject subject, Chromosome chromosome) {
         int score = 10;  // Base score for each subject
 
-        // Check if prerequisites are satisfied
+        // Reward if prerequisites are satisfied
         for (String prerequisite : subject.getPrerequisites()) {
-            if (!chromosome.hasCompletedSubject(prerequisite)) {
-                score -= 5;  // Penalize if prerequisite not met
+            if (chromosome.hasCompletedSubject(prerequisite)) {
+                score += 5;
+            } else {
+                score -= 10;  // Penalize if prerequisite not met
             }
         }
 
-        // You can add more criteria to calculate fitness based on your constraints
+        // Reward core subjects
+        if (subject.isCoreSubject()) {
+            score += 10;
+        }
+
+        // Penalize for exceeding credit limit
+        int totalCredits = chromosome.getTotalCreditHours();
+        if (totalCredits > chromosome.getMaxCredits()) {
+            score -= (totalCredits - chromosome.getMaxCredits()) * 5;
+        }
 
         return score;
     }
