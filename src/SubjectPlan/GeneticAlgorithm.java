@@ -3,6 +3,7 @@ package SubjectPlan;
 import Data.Chromosome;
 import Data.Population;
 import Data.Student;
+import Data.Subject;
 import Operators.CrossoverOperator;
 import Operators.FitnessFunction;
 import Operators.MutationOperator;
@@ -32,16 +33,17 @@ public class GeneticAlgorithm {
         return population;
     }
 
-    public Chromosome evolve(Population population) {
-        for (int i = 0; i < 100; i++) {  // Set to 100 generations
+    // Modify the evolve method to take availableSubjects as a parameter
+    public Chromosome evolve(Population population, List<Subject> availableSubjects, List<Subject> completedSubjects) {
+        for (int i = 0; i < 100; i++) {  // Run for a fixed number of generations
             List<Chromosome> newChromosomes = new ArrayList<>();
 
             for (int j = 0; j < population.getChromosomes().size(); j++) {
                 Chromosome parent1 = selectionOperator.select(population);
                 Chromosome parent2 = selectionOperator.select(population);
 
-                Chromosome child = crossoverOperator.crossover(parent1, parent2);
-                mutationOperator.mutate(child);
+                Chromosome child = crossoverOperator.crossover(parent1, parent2, completedSubjects);
+                mutationOperator.mutate(child, availableSubjects, completedSubjects);
                 fitnessFunction.calculateFitness(child);
 
                 newChromosomes.add(child);

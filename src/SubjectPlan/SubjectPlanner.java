@@ -16,19 +16,21 @@ public class SubjectPlanner {
     }
 
     public void planSubjects(Student student, List<Subject> availableSubjects) {
-        // Create initial chromosomes for population based on student data
         List<Chromosome> initialChromosomes = new ArrayList<>();
 
-        // Initialize chromosomes with random selection of subjects, respecting constraints
+        // Initialize chromosomes, filtering out completed subjects
         for (int i = 0; i < 10; i++) {  // Initialize 10 sample chromosomes
             List<Subject> randomSubjects = new ArrayList<>(availableSubjects);
             Chromosome chromosome = new Chromosome(randomSubjects);
+
+            // Filter out any subjects that the student has already completed
+            chromosome.filterCompletedSubjects(student.getCompletedSubjects());
             initialChromosomes.add(chromosome);
         }
 
-        // Initialize population and run GA
+        // Initialize population and run GA, passing availableSubjects and completedSubjects
         Population population = ga.initializePopulation(initialChromosomes);
-        Chromosome bestPlan = ga.evolve(population);
+        Chromosome bestPlan = ga.evolve(population, availableSubjects, student.getCompletedSubjects());
 
         System.out.println("Best plan for " + student.getName() + ": " + bestPlan);
     }

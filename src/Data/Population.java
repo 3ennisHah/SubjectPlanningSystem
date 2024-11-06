@@ -2,6 +2,7 @@ package Data;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Comparator;
 
 public class Population {
     private List<Chromosome> chromosomes;
@@ -19,7 +20,11 @@ public class Population {
     }
 
     public Chromosome getFittest() {
-        return chromosomes.stream().max((c1, c2) -> Integer.compare(c1.getFitness(), c2.getFitness())).orElse(null);
+        return chromosomes.stream().max(Comparator.comparingInt(Chromosome::getFitness)).orElse(null);
+    }
+
+    public Chromosome getLeastFit() {
+        return chromosomes.stream().min(Comparator.comparingInt(Chromosome::getFitness)).orElse(null);
     }
 
     public int getTotalFitness() {

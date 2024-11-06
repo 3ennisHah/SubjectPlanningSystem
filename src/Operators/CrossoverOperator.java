@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CrossoverOperator {
-    public Chromosome crossover(Chromosome parent1, Chromosome parent2) {
+    public Chromosome crossover(Chromosome parent1, Chromosome parent2, List<Subject> completedSubjects) {
         int crossoverPoint = (int) (Math.random() * parent1.getSubjects().size());
         List<Subject> childSubjects = new ArrayList<>();
 
@@ -16,41 +16,16 @@ public class CrossoverOperator {
             childSubjects.add(parent1.getSubjects().get(i));
         }
 
-        // Add subjects from parent2 beyond the crossover point
+        // Add remaining subjects from parent2 beyond the crossover point
         for (int i = crossoverPoint; i < parent2.getSubjects().size(); i++) {
             Subject subject = parent2.getSubjects().get(i);
-            if (!childSubjects.contains(subject)) {
+            if (!childSubjects.contains(subject) &&
+                    completedSubjects.stream().noneMatch(c -> c.getSubjectCode().equals(subject.getSubjectCode()))) {
                 childSubjects.add(subject);
             }
         }
 
-        // Ensure prerequisites are met by removing subjects that violate the constraint
-        removeInvalidSubjects(childSubjects);
-
         return new Chromosome(childSubjects);
-    }
-
-    private void removeInvalidSubjects(List<Subject> subjects) {
-        // Example implementation to remove subjects that don't meet prerequisites
-        List<Subject> validSubjects = new ArrayList<>();
-        for (Subject subject : subjects) {
-            boolean prerequisitesMet = true;
-            for (String prerequisite : subject.getPrerequisites()) {
-                if (!containsSubjectCode(validSubjects, prerequisite)) {
-                    prerequisitesMet = false;
-                    break;
-                }
-            }
-            if (prerequisitesMet) {
-                validSubjects.add(subject);
-            }
-        }
-        subjects.clear();
-        subjects.addAll(validSubjects);
-    }
-
-    private boolean containsSubjectCode(List<Subject> subjects, String code) {
-        return subjects.stream().anyMatch(s -> s.getSubjectCode().equals(code));
     }
 }
 

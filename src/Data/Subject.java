@@ -40,4 +40,3 @@ public class Subject {
         return subjectName + " (" + subjectCode + ")";
     }
 }
-
