@@ -4,17 +4,22 @@ import Data.Chromosome;
 import Data.Subject;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class MutationOperator {
     public void mutate(Chromosome chromosome, List<Subject> availableSubjects, List<Subject> completedSubjects) {
         List<Subject> subjects = chromosome.getSubjects();
-        int index1 = (int) (Math.random() * subjects.size());
-        int index2 = (int) (Math.random() * availableSubjects.size());
+        Set<String> currentSubjectCodes = subjects.stream()
+                .map(Subject::getSubjectCode)
+                .collect(Collectors.toSet());
 
-        // Swap subjects only if the new subject isn't completed
-        Subject newSubject = availableSubjects.get(index2);
-        if (completedSubjects.stream().noneMatch(c -> c.getSubjectCode().equals(newSubject.getSubjectCode()))) {
-            subjects.set(index1, newSubject);
+        int index = (int) (Math.random() * subjects.size());
+        Subject newSubject = availableSubjects.get((int) (Math.random() * availableSubjects.size()));
+
+        if (!currentSubjectCodes.contains(newSubject.getSubjectCode()) &&
+                completedSubjects.stream().noneMatch(c -> c.getSubjectCode().equals(newSubject.getSubjectCode()))) {
+            subjects.set(index, newSubject);
         }
     }
 }

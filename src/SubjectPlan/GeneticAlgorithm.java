@@ -2,7 +2,6 @@ package SubjectPlan;
 
 import Data.Chromosome;
 import Data.Population;
-import Data.Student;
 import Data.Subject;
 import Operators.CrossoverOperator;
 import Operators.FitnessFunction;
@@ -33,9 +32,10 @@ public class GeneticAlgorithm {
         return population;
     }
 
-    // Modify the evolve method to take availableSubjects as a parameter
     public Chromosome evolve(Population population, List<Subject> availableSubjects, List<Subject> completedSubjects) {
-        for (int i = 0; i < 100; i++) {  // Run for a fixed number of generations
+        Chromosome bestChromosome = null;
+
+        for (int generation = 0; generation < 50; generation++) {
             List<Chromosome> newChromosomes = new ArrayList<>();
 
             for (int j = 0; j < population.getChromosomes().size(); j++) {
@@ -48,9 +48,17 @@ public class GeneticAlgorithm {
 
                 newChromosomes.add(child);
             }
+
             population = new Population(newChromosomes);
+            Chromosome currentBest = population.getFittest();
+            if (bestChromosome == null || currentBest.getFitness() > bestChromosome.getFitness()) {
+                bestChromosome = currentBest;
+            }
+
+            // Print current generation details
+            System.out.println("Generation " + (generation + 1) + " Best Fitness: " + currentBest.getFitness());
         }
-        return population.getFittest();
+
+        return bestChromosome;
     }
 }
-
