@@ -1,0 +1,283 @@
+document.addEventListener('DOMContentLoaded', () => {
+    const editBtn = document.getElementById('edit-btn');
+    const editPanel = document.getElementById('edit-panel');
+    const modal = document.getElementById('modal');
+    const modalTitle = document.getElementById('modal-title');
+    const modalInput = document.getElementById('modal-input');
+    const modalConfirm = document.getElementById('modal-confirm');
+    const modalCancel = document.getElementById('modal-cancel');
+    const addBlockBtn = document.getElementById('add-block');
+    const changeColorBtn = document.getElementById('change-color');
+    const changeBorderColorBtn = document.getElementById('change-border-color');
+    const columns = document.querySelectorAll('.column');
+    const contextMenu = document.getElementById('context-menu');
+    const subjectDropdown = document.getElementById('subject-dropdown');
+    const renameBtn = document.getElementById('rename-btn');
+    const infoBtn = document.getElementById('info-btn');
+    const infoModal = document.getElementById('info-modal');
+    const infoText = document.getElementById('info-text');
+    const closeInfo = document.getElementById('close-info');
+    const tooltip = document.getElementById('tooltip'); // Tooltip element
+    let selectedBlock = null;
+    let editMode = false; // Flag to track edit mode
+    let tooltipTimeout; // Variable to store the timeout for showing the tooltip
+
+    // Sample subject details
+    const subjectDetails = {
+        item1: "Sample details 1: Lorem ipsum dolor sit amet.",
+        item2: "Sample details 2: Consectetur adipiscing elit.",
+        item3: "Sample details 3: Sed do eiusmod tempor incididunt.",
+        item4: "Sample details 4: Ut labore et dolore magna aliqua.",
+        item5: "Sample details 5: Ut enim ad minim veniam.",
+    };
+
+    // Function to make subjects undraggable
+    const makeSubjectsUndraggable = () => {
+        const subjects = document.querySelectorAll('.draggable');
+        subjects.forEach(subject => {
+            subject.setAttribute('draggable', 'false');
+        });
+    };
+
+    // Call the function to make subjects undraggable on load
+    makeSubjectsUndraggable();
+
+    // Toggle edit panel visibility and draggable state
+    editBtn.addEventListener('click', () => {
+        editMode = !editMode;
+        editPanel.style.display = editMode ? 'block' : 'none';
+
+        if (editMode) {
+            editBtn.textContent = 'Stop Edit Mode';
+            editBtn.style.backgroundColor = 'red';
+            document.querySelectorAll('.draggable').forEach(draggable => {
+                draggable.setAttribute('draggable', 'true');
+                attachDraggableEvents(draggable);
+            });
+        } else {
+            editBtn.textContent = 'Edit Mode';
+            editBtn.style.backgroundColor = '';
+            document.querySelectorAll('.draggable').forEach(draggable => {
+                draggable.setAttribute('draggable', 'false');
+                detachDraggableEvents(draggable);
+            });
+        }
+    });
+
+    // Attach draggable events to blocks
+    const attachDraggableEvents = (draggable) => {
+        draggable.addEventListener('dragstart', (event) => {
+            event.dataTransfer.setData('text/plain', event.target.id);
+            event.target.classList.add('dragging');
+        });
+
+        draggable.addEventListener('dragend', (event) => {
+            event.target.classList.remove('dragging');
+        });
+
+        // Click to select the block and darken it
+        draggable.addEventListener('click', () => {
+            if (selectedBlock) {
+                selectedBlock.classList.remove('selected');
+            }
+            selectedBlock = draggable;
+            selectedBlock.classList.add('selected');
+        });
+
+        // Right-click to open context menu
+        draggable.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            selectedBlock = draggable;
+            contextMenu.style.top = `${e.pageY}px`;
+            contextMenu.style.left = `${e.pageX}px`;
+            contextMenu.style.display = 'block';
+
+            const renameBtn = document.getElementById('rename-btn');
+            if (selectedBlock.classList.contains('free-elective')) {
+                renameBtn.style.display = 'block';
+            } else {
+                renameBtn.style.display = 'none';
+            }
+
+            const insertSubjectBtn = document.getElementById('insert-subject-btn');
+            if (selectedBlock.classList.contains('free-elective')) {
+                insertSubjectBtn.style.display = 'block';
+            } else {
+                insertSubjectBtn.style.display = 'none';
+            }
+        });
+
+        // Show tooltip on hover
+        draggable.addEventListener('mouseenter', () => {
+            tooltipTimeout = setTimeout(() => {
+                const blockName = draggable.querySelector('.subject-text') ? draggable.querySelector('.subject-text').textContent : draggable.textContent;
+                const details = subjectDetails[draggable.id] || `Details for ${blockName} are not available.`;
+                tooltip.textContent = details;
+                tooltip.style.display = 'block';
+                const rect = draggable.getBoundingClientRect();
+                tooltip.style.left = `${rect.right + 5}px`;
+                tooltip.style.top = `${rect.top}px`;
+            }, 1000); // Show tooltip after 1 second
+        });
+
+        draggable.addEventListener('mouseleave', () => {
+            clearTimeout(tooltipTimeout);
+            tooltip.style.display = 'none';
+        });
+    };
+
+    // Function to detach draggable events
+    const detachDraggableEvents = (draggable) => {
+        draggable.removeEventListener('dragstart', (event) => {
+            event.dataTransfer.setData('text/plain', event.target.id);
+            event.target.classList.add('dragging');
+        });
+        draggable.removeEventListener('dragend', (event) => {
+            event.target.classList.remove('dragging');
+        });
+    };
+
+    // Add event listeners to columns for drop functionality
+    columns.forEach((column) => {
+        column.addEventListener('dragover', (event) => {
+            event.preventDefault();
+        });
+
+        column.addEventListener('drop', (event) => {
+            event.preventDefault();
+            const id = event.dataTransfer.getData('text/plain');
+            const draggable = document.getElementById(id);
+            if (draggable) {
+                column.appendChild(draggable);
+            }
+        });
+    });
+
+    // Add block to the first column
+    addBlockBtn.addEventListener('click', () => {
+        const newBlock = document.createElement('div');
+        newBlock.classList.add('draggable', 'free-elective', 'subject-card');
+        newBlock.innerHTML = '<div class="subject-text">Free Elective</div>';
+        newBlock.id = `item${document.querySelectorAll('.draggable').length + 1}`;
+        newBlock.setAttribute('draggable', 'false');
+        attachDraggableEvents(newBlock);
+        columns[0].appendChild(newBlock);
+    });
+
+    // Change block color
+    changeColorBtn.addEventListener('click', () => {
+        if (!selectedBlock) {
+            alert('Select a block first!');
+            return;
+        }
+        const color = prompt('Enter a color (name or hex code):');
+        if (color) {
+            selectedBlock.style.backgroundColor = color;
+        }
+    });
+
+    // Change block border color
+    changeBorderColorBtn.addEventListener('click', () => {
+        if (!selectedBlock) {
+            alert('Select a block first!');
+            return;
+        }
+        const borderColor = prompt('Enter a border color (name or hex code):');
+        if (borderColor) {
+            selectedBlock.style.borderColor = borderColor;
+        }
+    });
+
+    // Insert subject from context menu
+    document.getElementById('insert-subject-btn').addEventListener('click', () => {
+        if (!selectedBlock) {
+            alert('Select a block first!');
+            return;
+        }
+
+        const dropdownPanel = document.getElementById('dropdown-panel');
+        dropdownPanel.style.display = 'flex';
+
+        const subjectDropdown = document.getElementById('subject-dropdown');
+        subjectDropdown.value = '';
+
+        document.getElementById('subject-confirm').onclick = function() {
+            const selectedSubject = subjectDropdown.value;
+            if (selectedSubject) {
+                selectedBlock.textContent = selectedSubject;
+                dropdownPanel.style.display = 'none';
+            }
+        };
+
+        dropdownPanel.onclick = function(e) {
+            if (e.target === dropdownPanel) {
+                dropdownPanel.style.display = 'none';
+            }
+        };
+    });
+
+    // Rename the selected block
+    renameBtn.addEventListener('click', () => {
+        if (!selectedBlock) {
+            alert('Select a block first!');
+            return;
+        }
+        selectedBlock.textContent = '';
+        selectedBlock.contentEditable = 'true';
+        selectedBlock.focus();
+
+        selectedBlock.addEventListener('blur', () => {
+            selectedBlock.contentEditable = 'false';
+            selectedBlock.classList.remove('selected');
+        });
+    });
+
+    // Remove the selected block
+    document.getElementById('remove-btn').addEventListener('click', () => {
+        if (!selectedBlock) {
+            alert('Select a block first!');
+            return;
+        }
+        selectedBlock.remove();
+        contextMenu.style.display = 'none';
+        selectedBlock = null;
+    });
+
+    // Add functionality for the Info button
+    infoBtn.addEventListener('click', () => {
+        if (!selectedBlock) {
+            alert('Select a block first!');
+            return;
+        }
+
+        const blockName = selectedBlock.querySelector('.subject-text') ? selectedBlock.querySelector('.subject-text').textContent : selectedBlock.textContent;
+        const details = subjectDetails[selectedBlock.id] || `Details for ${blockName} are not available.`;
+        infoText.textContent = details;
+        infoModal.style.display = 'block';
+    });
+
+    // Close the modal when the close button is clicked
+    closeInfo.addEventListener('click', () => {
+        infoModal.style.display = 'none';
+    });
+
+    // Close the modal when clicking outside of the modal content
+    window.addEventListener('click', (event) => {
+        if (event.target === infoModal) {
+            infoModal.style.display = 'none';
+        }
+    });
+
+    // Initialize context menu
+    document.addEventListener('click', (e) => {
+        if (e.target !== contextMenu) {
+            contextMenu.style.display = 'none';
+        }
+    });
+
+    // Initialize draggable blocks
+    document.querySelectorAll('.draggable').forEach(draggable => {
+        detachDraggableEvents(draggable);
+        attachDraggableEvents(draggable);
+    });
+});
