@@ -1,0 +1,381 @@
+/* General Styles */
+body {
+    font-family: 'Arial', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    background-color: #fafafa;
+    margin: 0;
+}
+
+.tooltip {
+    position: absolute;
+    background-color: white; /* Solid white background */
+    color: black; /* Black font color */
+    padding: 10px;
+    border: 2px solid black; /* Black border */
+    border-radius: 5px; /* Optional: for rounded corners */
+    z-index: 100;
+    pointer-events: none; /* Prevent tooltip from interfering with mouse events */
+    transition: opacity 0.3s; /* Optional: add a fade effect */
+    opacity: 1; /* Start as invisible */
+}
+
+
+/* Drag-and-Drop Container */
+#drag-container {
+    display: flex;
+    width: 100%;
+    height: 700px; /* Adjusted height to accommodate taller columns */
+    padding: 20px;
+    box-sizing: border-box;
+    justify-content: center; /* Center the columns horizontally */
+    gap: 10px; /* Set a constant gap of 10px between columns */
+}
+
+/* Columns Container */
+.column-container {
+    flex: 0 0 auto; /* Prevent columns from growing or shrinking */
+}
+
+/* Columns Styling */
+.column {
+    width: 145px; /* Set width to 145px */
+    height: 700px; /* Set height to 700px */
+    background: linear-gradient(to bottom, #a3c1e0, #6ca0d8); /* Pastel blue gradient */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: auto;
+    padding: 10px; /* Increased padding for better spacing */
+    box-sizing: border-box;
+    border-radius: 8px; /* Rounded corners */
+    transition: filter 0.3s; /* Smooth filter transition */
+    z-index: 0;
+}
+
+.column:hover {
+    filter: brightness(1.1); /* Lighten on hover */
+}
+
+/* Draggable Items */
+.draggable {
+    width: 100px;
+    height: 100px;
+    background-color: #FFC107; /* Original color */
+    color: #333;
+    text-align: center; /* Center text */
+    padding: 10px;
+    border-radius: 8px;
+    cursor: move;
+    margin-bottom: 10px; /* Increased margin for better spacing */
+    transition: box-shadow 0.2s, transform 0.2s, background-color 0.3s; /* Added background transition */
+    /* box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); */
+}
+
+.draggable.free-elective {
+    background-color: #66BB6A; /* Green color for free electives */
+}
+
+/* Hover effect for free electives */
+.draggable.free-elective:hover {
+    background-color: #4CAF50; /* Darker shade of green */
+}
+
+.draggable:hover {
+    background-color: #FFA000; /* Darken on hover */
+    filter: brightness(0.8); /* Darken the subject */
+}
+
+.draggable:active {
+    transform: translate(-2px, -2px);
+}
+
+/* Subject Card Styles */
+.subject-card {
+    background-color: #FFC107; /* Amber color */
+    height: 100px; /* Adjust height as needed */
+    display: flex;
+    align-items: center; /* Center text vertically */
+    justify-content: center; /* Center text horizontally */
+    position: relative; /* For positioning the inner box */
+    margin-bottom: 10px; /* Space between cards */
+}
+
+/* Style for the text box inside the subject card */
+.subject-text {
+    background-color: white; /* White background for text */
+    padding: 10px; /* Padding around the text */
+    border-radius: 5px; /* Rounded corners */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Optional shadow for depth */
+}
+
+.modal {
+    display: block; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1000; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto; /* 15% from the top and centered */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%; /* Could be more or less, depending on screen size */
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Edit Button */
+.edit-btn {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 15px; /* Added padding for better button size */
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 5px; /* Rounded corners */
+    transition: filter 0.3s; /* Smooth filter transition */
+}
+
+.edit-btn:hover {
+    filter: brightness(0.9); /* Darken on hover */
+}
+
+/* Edit Panel */
+.edit-panel {
+    position: fixed;
+    bottom: 50px;
+    left: 10px;
+    background-color: white;
+    border: 1px solid #ccc;
+    padding: 15px; /* Increased padding for better spacing */
+    display: none;
+    border-radius: 8 px; /* Rounded corners */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* Added shadow */
+}
+
+.edit-panel button {
+    display: block;
+    margin: 5px 0;
+    padding: 10px; /* Added padding for better button size */
+    border-radius: 5px; /* Rounded corners */
+    transition: filter 0.3s; /* Smooth filter transition */
+}
+
+.edit-panel button:hover {
+    filter: brightness(0.7); /* Darken on hover */
+}
+
+/* Modal Styling */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgba(0, 0, 0, 0.5); /* Black w/ opacity */
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto; /* 15% from the top and centered */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 300px; /* Could be more or less, depending on screen size */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0  2px 10px rgba(0, 0, 0, 0.2); /* Added shadow */
+}
+
+.modal input {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc; /* Added border */
+    border-radius: 5px; /* Rounded corners */
+}
+
+.modal button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px; /* Rounded corners */
+    transition: filter 0.3s; /* Smooth filter transition */
+}
+
+.modal button:hover {
+    filter: brightness(0.8); /* Darken on hover */
+}
+
+/* Context Menu */
+.context-menu {
+    position: absolute;
+    background: white;
+    border: 1px solid #ccc;
+    z-index:1;
+    display: none;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    width: 120px;
+    padding: 5px 0;
+}
+
+.context-menu ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.context-menu li {
+    padding: 10px;
+    cursor: pointer;
+    transition: filter 0.2s;
+}
+
+.context-menu li:hover {
+    filter: brightness(1.1); /* Lighten on hover */
+}
+
+/* Drop Zone */
+.drop-zone {
+    width: 300px;
+    height: 150px;
+    border: 2px dashed #ccc;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    color: #aaa;
+    transition: border-color 0.3s; /* Smooth border transition */
+}
+
+.drop-zone.drag-over {
+    border-color: #4CAF50;
+    color: #333;
+}
+
+.drop-zone:hover {
+    filter: brightness(1.1); /* Lighten on hover */
+}
+
+/* Dropdown Panel */
+.subject-dropdown {
+    position: fixed; /* Keep it fixed to ensure it's on top */
+    top: 50px; /* Adjust to position correctly */
+    left: 50px; /* Adjust based on where you want it to appear */
+    background-color: white;
+    border: 1px solid #ccc;
+    padding: 15px;
+    display: none; /* Initially hidden */
+    z-index: 9999; /* Ensure it’s very high */
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Full-Screen Overlay for Subject Selection */
+.dropdown-panel {
+    display: none; /* Hidden by default */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+    z-index: 9999; /* High z-index to overlay everything */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dropdown-panel-content {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    width: 300px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+/* Default button style */
+#enableDragDropButton {
+    background-color: gray; /* Default color */
+    color: white; /* Text color */
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+/* Class for the active state */
+.active {
+    background-color: lightgreen; /* Color when active */
+}
+
+.rename-input {
+    display: none;
+}
+/* Subject Card Styles */
+.subject-card {
+    background-color: #FFC107; /* Amber color for the card */
+    height: 120px; /* Increased height to accommodate text and kebab menu */
+    display: flex;
+    flex-direction: column; /* Stack items vertically */
+    align-items: center; /* Center text horizontally */
+    justify-content: center; /* Center text vertically */
+    position: relative; /* For positioning the inner box */
+    margin-bottom: 10px; /* Space between cards */
+    border-radius: 8px; /* Optional: rounded corners */
+}
+
+/* Style for the text box inside the subject card */
+.subject-text {
+    background-color: white; /* White background for text */
+    padding: 10px; /* Padding around the text */
+    border-radius: 5px; /* Rounded corners */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Optional shadow for depth */
+    margin-bottom: 5px; /* Space between text and kebab menu */
+}
+
+/* Kebab menu styles (example) */
+.kebab-menu {
+    background-color: #fff; /* White background for the kebab menu */
+    border: 1px solid #ccc; /* Light border */
+    border-radius: 5px; /* Rounded corners */
+    padding: 5px; /* Padding inside the kebab menu */
+    display: flex; /* Flexbox for layout */
+    flex-direction: column; /* Stack menu items vertically */
+    position: absolute; /* Position it absolutely */
+    top: 5px; /* Adjust as needed */
+    right: 5px; /* Adjust as needed */
+    display: none; /* Initially hidden */
+    z-index: 10; /* Ensure it appears above other elements */
+}
+
+/* Show kebab menu on hover (example) */
+.subject-card:hover .kebab-menu {
+    display: flex; /* Show the menu on hover */
+}
