@@ -1,61 +1,111 @@
-package SubjectPlan;
+package Data;
 
-import Data.Subject;
-
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ProgrammeLineup {
-    private String cohort;
-    private boolean isDirect;
-    private Set<Subject> coreSubjects = new HashSet<>();
-    private Set<Subject> disciplineElectivesY2 = new HashSet<>();
-    private Set<Subject> disciplineElectivesY3 = new HashSet<>();
-    private Set<Subject> freeElectives = new HashSet<>();
-    private Set<Subject> compulsorySubjects = new HashSet<>();
+    private List<Subject> semesterSubjects;
 
-    public ProgrammeLineup(String cohort, boolean isDirect) {
-        this.cohort = cohort;
-        this.isDirect = isDirect;
+    public ProgrammeLineup() {
+        this.semesterSubjects = new ArrayList<>();
     }
 
-    public void addCoreSubject(Subject subject) {
-        coreSubjects.add(subject);
+    public void addSubjectsForSemester(Subject... subjects) {
+        for (Subject subject : subjects) {
+            semesterSubjects.add(subject);
+        }
     }
 
-    public void addDisciplineElectiveY2(Subject subject) {
-        disciplineElectivesY2.add(subject);
+    public List<Subject> getSemesterSubjects() {
+        return semesterSubjects;
     }
 
-    public void addDisciplineElectiveY3(Subject subject) {
-        disciplineElectivesY3.add(subject);
+    // ********** Category: BCS 2024 ********** //
+
+    public static ProgrammeLineup getJanuary2024Lineup() {
+        ProgrammeLineup lineup = new ProgrammeLineup();
+
+        lineup.addSubjectsForSemester(
+                Subject.MPU3193, Subject.MPU3203, Subject.CSC1024 // Jan 2024 (Short Semester)
+        );
+        lineup.addSubjectsForSemester(
+                Subject.ENG1044, Subject.CSC1202, Subject.MTH1114, Subject.PRG1203 // Mar 2024 Sem 2
+        );
+        lineup.addSubjectsForSemester(
+                Subject.SEG1201, Subject.NET1014, Subject.CSC2104, Subject.WEB1201 // Aug 2024 Sem 3
+        );
+        lineup.addSubjectsForSemester(
+                Subject.MPU3222, Subject.SEG2202, Subject.MPU3412 // Jan 2025 Sem 4
+        );
+        lineup.addSubjectsForSemester(
+                Subject.CSC2103, Subject.CSC2014, Subject.PRG2104, Subject.ENG2044 // Mar 2025 Sem 5
+        );
+        lineup.addSubjectsForSemester(
+                Subject.SEG3203 // Jan 2026 Sem 7 Internship
+        );
+        lineup.addSubjectsForSemester(
+                Subject.NET3204, Subject.PRJ3223, Subject.CSC3024 // Aug 2026 Sem 9
+        );
+
+        return lineup;
     }
 
-    public void addFreeElective(Subject subject) {
-        freeElectives.add(subject);
+    public static ProgrammeLineup getMarch2024Lineup() {
+        ProgrammeLineup lineup = new ProgrammeLineup();
+
+        lineup.addSubjectsForSemester(
+                Subject.ENG1044, Subject.CSC1202, Subject.CSC1024, Subject.MTH1114 // Mar 2024 Sem 1
+        );
+        lineup.addSubjectsForSemester(
+                Subject.SEG1201, Subject.PRG1203, Subject.WEB1201, Subject.CSC2104 // Aug 2024 Sem 2
+        );
+        lineup.addSubjectsForSemester(
+                Subject.MPU3193, Subject.MPU3203, Subject.NET1014 // Jan 2025 Sem 3
+        );
+        lineup.addSubjectsForSemester(
+                Subject.CSC2103, Subject.CSC2014, Subject.PRG2104, Subject.ENG2044 // Mar 2025 Sem 4
+        );
+        lineup.addSubjectsForSemester(
+                Subject.DECN2014, Subject.ETP2014, Subject.PRG2205, Subject.CSC2044 // Aug 2025 Sem 5 Electives + Free
+        );
+        lineup.addSubjectsForSemester(
+                Subject.MPU3222, Subject.SEG2202, Subject.MPU3412 // Jan 2026 Sem 6
+        );
+        lineup.addSubjectsForSemester(
+                Subject.CSC3206, Subject.PRJ3213, Subject.NET3204 // Mar 2026 Sem 7 Electives
+        );
+        lineup.addSubjectsForSemester(
+                Subject.PRJ3223, Subject.CSC3024, Subject.NET3204 // Aug 2026 Sem 8
+        );
+        lineup.addSubjectsForSemester(
+                Subject.SEG3203 // Jan 2027 Internship
+        );
+
+        return lineup;
     }
 
-    public void addCompulsorySubject(Subject subject) {
-        compulsorySubjects.add(subject);
-    }
+    public static ProgrammeLineup getAugust2024Lineup() {
+        ProgrammeLineup lineup = new ProgrammeLineup();
 
-    public Set<Subject> getCoreSubjects() {
-        return new HashSet<>(coreSubjects); // Return a new mutable set
-    }
+        lineup.addSubjectsForSemester(
+                Subject.CSC1024, Subject.CSC1202, Subject.ENG1044, Subject.MTH1114 // Aug 2024 Sem 1
+        );
+        lineup.addSubjectsForSemester(
+                Subject.MPU3193, Subject.MPU3203, Subject.NET1014 // Jan 2025 Sem 2
+        );
+        lineup.addSubjectsForSemester(
+                Subject.CSC2104, Subject.PRG1203, Subject.SEG1201, Subject.WEB1201 // Mar 2025 Sem 3
+        );
+        lineup.addSubjectsForSemester(
+                Subject.CSC2103, Subject.CSC2014, Subject.PRG2104, Subject.ENG2044 // Mar 2026 Sem 4
+        );
+        lineup.addSubjectsForSemester(
+                Subject.DECN2014, Subject.ETP2014, Subject.CSC3034, Subject.PRG3014 // Aug 2026 Sem 5 Free & Electives
+        );
+        lineup.addSubjectsForSemester(
+                Subject.CSC3206, Subject.PRJ3213 // Mar 2027 Sem 6 Electives & Capstone 1
+        );
 
-    public Set<Subject> getDisciplineElectivesY2() {
-        return disciplineElectivesY2;
-    }
-
-    public Set<Subject> getDisciplineElectivesY3() {
-        return disciplineElectivesY3;
-    }
-
-    public Set<Subject> getFreeElectives() {
-        return freeElectives;
-    }
-
-    public Set<Subject> getCompulsorySubjects() {
-        return compulsorySubjects;
+        return lineup;
     }
 }
