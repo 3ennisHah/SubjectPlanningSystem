@@ -65,6 +65,7 @@ public class Subject {
     public static final Subject NET3204 = new Subject("NET3204", "Distributed Systems", 4, new String[]{}, true);
     public static final Subject PRJ3223 = new Subject("PRJ3223", "Capstone Project 2", 3, new String[]{}, true);
     public static final Subject CSC3024 = new Subject("CSC3024", "Human Computer Interaction", 4, new String[]{}, true);
+    public static final Subject NET2201 = new Subject("NET2201", "Computer Networks", 4, new String[]{}, true);
 
     // ******** Computing Electives ******** //
     public static final Subject CSC2044 = new Subject("CSC2044", "Concurrent Programming", 4, new String[]{}, true);
@@ -81,10 +82,17 @@ public class Subject {
     public static final Subject PRG2205 = new Subject("PRG2205", "Programming Languages", 4, new String[]{}, true);
     public static final Subject PRG3014 = new Subject("PRG3014", "UI/UX Design and Development", 4, new String[]{}, true);
 
+
     // ******** Non-Computing (Free) Electives ******** //
     public static final Subject DECN2014 = new Subject("DECN2014", "Digital Economy", 4, new String[]{}, false);
     public static final Subject ETP2014 = new Subject("ETP2014", "StartUp Foundry", 4, new String[]{}, false);
     public static final Subject PSY2164 = new Subject("PSY2164", "Introduction to Psychology", 4, new String[]{}, false);
     public static final Subject MKT2224 = new Subject("MKT2224", "Principles of Marketing", 4, new String[]{}, false);
     public static final Subject ENT2114 = new Subject("ENT2114", "Principles of Entrepreneurship", 4, new String[]{}, false);
+    public static final Subject MPU3312 = new Subject("MPU3312", "Sustainable Development in Malaysia", 2, new String[]{}, false);
+    public static final Subject BIS2212 = new Subject("BIS2212", "Social & Professional Responsibilities", 2, new String[]{}, false);
+
+
+    // Additional Math subject
+    public static final Subject MAT1013 = new Subject("MAT1013", "Micro-Credential in Computer Mathematics Fundamentals", 3, new String[]{}, true);
 }
