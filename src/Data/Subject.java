@@ -66,6 +66,11 @@ public class Subject {
     public static final Subject PRJ3223 = new Subject("PRJ3223", "Capstone Project 2", 3, new String[]{}, true);
     public static final Subject CSC3024 = new Subject("CSC3024", "Human Computer Interaction", 4, new String[]{}, true);
     public static final Subject NET2201 = new Subject("NET2201", "Computer Networks", 4, new String[]{}, true);
+    public static final Subject MPU3183 = new Subject("MPU3183", "Penghayatan Etika dan Peradaban", 3, new String[]{}, false);
+    public static final Subject MPU3213 = new Subject("MPU3213", "Malay Language for Communication 2", 3, new String[]{}, false);
+    public static final Subject KIAR = new Subject("KIAR", "Integrity and Anti-Corruption", 2, new String[]{}, false);
+    public static final Subject ENG2042 = new Subject("ENG2042", "Communication Skills for Professional Practice", 2, new String[]{}, false);
+    public static final Subject MPU3312 = new Subject("MPU3312", "Sustainable Development in Malaysia", 2, new String[]{}, false);
 
     // ******** Computing Electives ******** //
     public static final Subject CSC2044 = new Subject("CSC2044", "Concurrent Programming", 4, new String[]{}, true);
@@ -95,4 +100,42 @@ public class Subject {
 
     // Additional Math subject
     public static final Subject MAT1013 = new Subject("MAT1013", "Micro-Credential in Computer Mathematics Fundamentals", 3, new String[]{}, true);
+
+    // Dummy Electives
+    public static Subject FreeElective1;
+    public static Subject FreeElective2;
+    public static Subject FreeElective3;
+    public static Subject Elective1;
+    public static Subject Elective2;
+    public static Subject Elective3;
+    public static Subject Elective4;
+
+    // Methods to Set Electives Dynamically
+    public static void setElectivesForSemester(String elective, Subject subject) {
+        switch (elective) {
+            case "FreeElective1":
+                FreeElective1 = subject;
+                break;
+            case "FreeElective2":
+                FreeElective2 = subject;
+                break;
+            case "FreeElective3":
+                FreeElective3 = subject;
+                break;
+            case "Elective1":
+                Elective1 = subject;
+                break;
+            case "Elective2":
+                Elective2 = subject;
+                break;
+            case "Elective3":
+                Elective3 = subject;
+                break;
+            case "Elective4":
+                Elective4 = subject;
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown elective: " + elective);
+        }
+    }
 }
