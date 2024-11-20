@@ -7,21 +7,24 @@ public class Student {
     private String studentId;
     private String name;
     private List<Subject> completedSubjects;
-    private List<Subject> enrolledSubjects;
     private List<Subject> failedSubjects;
-    private boolean directEntry; // True if direct entry, false otherwise
-    private boolean mathRequirement; // True if math requirement is met, false otherwise
+    private boolean directEntry; // Direct entry flag
+    private boolean mathRequirement; // Math requirement flag
+    private String enrollmentYear; // Year of enrollment
+    private String enrollmentIntake; // Intake (e.g., January, March, August)
 
     public Student(String studentId, String name) {
         this.studentId = studentId;
         this.name = name;
         this.completedSubjects = new ArrayList<>();
-        this.enrolledSubjects = new ArrayList<>();
         this.failedSubjects = new ArrayList<>();
-        this.directEntry = false; // Default: not direct entry
-        this.mathRequirement = true; // Default: math requirement met
+        this.directEntry = false;
+        this.mathRequirement = false;
+        this.enrollmentYear = "";
+        this.enrollmentIntake = "";
     }
 
+    // Getters and Setters
     public String getStudentId() {
         return studentId;
     }
@@ -38,28 +41,12 @@ public class Student {
         completedSubjects.add(subject);
     }
 
-    public List<Subject> getEnrolledSubjects() {
-        return enrolledSubjects;
-    }
-
-    public void addEnrolledSubject(Subject subject) {
-        enrolledSubjects.add(subject);
-    }
-
     public List<Subject> getFailedSubjects() {
         return failedSubjects;
     }
 
     public void addFailedSubject(Subject subject) {
         failedSubjects.add(subject);
-    }
-
-    public boolean hasCompleted(String subjectCode) {
-        return completedSubjects.stream().anyMatch(subject -> subject.getSubjectCode().equals(subjectCode));
-    }
-
-    public boolean hasFailed(String subjectCode) {
-        return failedSubjects.stream().anyMatch(subject -> subject.getSubjectCode().equals(subjectCode));
     }
 
     public boolean isDirectEntry() {
@@ -78,15 +65,43 @@ public class Student {
         this.mathRequirement = mathRequirement;
     }
 
-    public String getDirectEntryStatus() {
-        return directEntry ? "Y" : "N";
+    public String getEnrollmentYear() {
+        return enrollmentYear;
     }
 
-    public String getMathRequirementStatus() {
-        return mathRequirement ? "Y" : "N";
+    public void setEnrollmentYear(String enrollmentYear) {
+        this.enrollmentYear = enrollmentYear;
     }
 
-    // Examples of students with different circumstances
+    public String getEnrollmentIntake() {
+        return enrollmentIntake;
+    }
+
+    public void setEnrollmentIntake(String enrollmentIntake) {
+        this.enrollmentIntake = enrollmentIntake;
+    }
+
+    // Check if a subject is already completed
+    public boolean hasCompleted(String subjectCode) {
+        return completedSubjects.stream()
+                .anyMatch(subject -> subject.getSubjectCode().equals(subjectCode));
+    }
+
+    @Override
+    public String toString() {
+        return "Student{" +
+                "studentId='" + studentId + '\'' +
+                ", name='" + name + '\'' +
+                ", completedSubjects=" + completedSubjects +
+                ", failedSubjects=" + failedSubjects +
+                ", directEntry=" + directEntry +
+                ", mathRequirement=" + mathRequirement +
+                ", enrollmentYear='" + enrollmentYear + '\'' +
+                ", enrollmentIntake='" + enrollmentIntake + '\'' +
+                '}';
+    }
+
+    // Example Students
     public static List<Student> getExampleStudents() {
         List<Student> students = new ArrayList<>();
 
@@ -99,8 +114,10 @@ public class Student {
         student1.addCompletedSubject(Subject.NET1014);
         student1.addCompletedSubject(Subject.SEG1201);
         student1.addCompletedSubject(Subject.CSC2104);
-        student1.setDirectEntry(false); // Not a direct entry student
-        student1.setMathRequirement(true); // Completed math requirement
+        student1.setDirectEntry(false);
+        student1.setMathRequirement(true);
+        student1.setEnrollmentYear("2024");
+        student1.setEnrollmentIntake("January");
         students.add(student1);
 
         // Student 2: No Math Background
@@ -109,9 +126,11 @@ public class Student {
         student2.addCompletedSubject(Subject.CSC1202);
         student2.addCompletedSubject(Subject.PRG1203);
         student2.addCompletedSubject(Subject.NET1014);
-        student2.addFailedSubject(Subject.MTH1114); // Failed math subject
-        student2.setDirectEntry(false); // Not a direct entry student
-        student2.setMathRequirement(false); // Did not complete math requirement
+        student2.addFailedSubject(Subject.MTH1114);
+        student2.setDirectEntry(false);
+        student2.setMathRequirement(false);
+        student2.setEnrollmentYear("2024");
+        student2.setEnrollmentIntake("March");
         students.add(student2);
 
         // Student 3: Failed a Subject
@@ -121,9 +140,11 @@ public class Student {
         student3.addCompletedSubject(Subject.MTH1114);
         student3.addCompletedSubject(Subject.PRG1203);
         student3.addCompletedSubject(Subject.NET1014);
-        student3.addFailedSubject(Subject.CSC2104); // Failed core subject
-        student3.setDirectEntry(true); // Direct entry student
-        student3.setMathRequirement(true); // Completed math requirement
+        student3.addFailedSubject(Subject.CSC2104);
+        student3.setDirectEntry(true);
+        student3.setMathRequirement(true);
+        student3.setEnrollmentYear("2024");
+        student3.setEnrollmentIntake("August");
         students.add(student3);
 
         return students;

@@ -2,13 +2,13 @@ package Data;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Comparator;
+import java.util.Random;
 
 public class Population {
-    private List<Chromosome> chromosomes;
+    private final List<Chromosome> chromosomes;
 
-    public Population(List<Chromosome> initialChromosomes) {
-        this.chromosomes = new ArrayList<>(initialChromosomes);
+    public Population(List<Chromosome> chromosomes) {
+        this.chromosomes = new ArrayList<>(chromosomes);
     }
 
     public List<Chromosome> getChromosomes() {
@@ -20,15 +20,32 @@ public class Population {
     }
 
     public Chromosome getFittest() {
-        return chromosomes.stream().max(Comparator.comparingInt(Chromosome::getFitness)).orElse(null);
+        return chromosomes.stream()
+                .max((c1, c2) -> Integer.compare(c1.getFitness(), c2.getFitness()))
+                .orElse(null);
     }
 
-    public Chromosome getLeastFit() {
-        return chromosomes.stream().min(Comparator.comparingInt(Chromosome::getFitness)).orElse(null);
+    public Chromosome select() {
+        int totalFitness = getTotalFitness();
+        int randomValue = new Random().nextInt(totalFitness);
+        int cumulativeFitness = 0;
+
+        for (Chromosome chromosome : chromosomes) {
+            cumulativeFitness += chromosome.getFitness();
+            if (cumulativeFitness >= randomValue) {
+                return chromosome;
+            }
+        }
+        return chromosomes.get(0); // Default fallback
+    }
+
+    public int size() {
+        return chromosomes.size();
     }
 
     public int getTotalFitness() {
-        return chromosomes.stream().mapToInt(Chromosome::getFitness).sum();
+        return chromosomes.stream()
+                .mapToInt(Chromosome::getFitness)
+                .sum();
     }
 }
-

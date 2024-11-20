@@ -2,6 +2,7 @@ package Operators;
 
 import Data.Chromosome;
 import Data.Subject;
+
 import java.util.List;
 
 public class FitnessFunction {
@@ -12,7 +13,7 @@ public class FitnessFunction {
     public int calculateFitness(Chromosome chromosome, List<Subject> completedSubjects, List<Subject> failedSubjects, int maxCredits) {
         int fitness = 100; // Start with perfect fitness
 
-        // Check hard constraints
+        // Hard constraints
         if (!satisfiesPrerequisites(chromosome, completedSubjects)) {
             fitness -= HARD_CONSTRAINT_PENALTY;
         }
@@ -29,7 +30,7 @@ public class FitnessFunction {
             fitness -= HARD_CONSTRAINT_PENALTY;
         }
 
-        // Check soft constraints
+        // Soft constraints
         if (!followsOriginalPlan(chromosome)) {
             fitness -= SOFT_CONSTRAINT_PENALTY;
         }
@@ -52,7 +53,7 @@ public class FitnessFunction {
     private boolean satisfiesPrerequisites(Chromosome chromosome, List<Subject> completedSubjects) {
         for (Subject subject : chromosome.getSubjects()) {
             for (String prerequisite : subject.getPrerequisites()) {
-                if (!completedSubjects.stream().anyMatch(s -> s.getSubjectCode().equals(prerequisite))) {
+                if (completedSubjects.stream().noneMatch(s -> s.getSubjectCode().equals(prerequisite))) {
                     return false; // Prerequisite not satisfied
                 }
             }
@@ -65,9 +66,8 @@ public class FitnessFunction {
     }
 
     private boolean subjectsOfferedThisSemester(Chromosome chromosome) {
-        // Check if all subjects in the chromosome are available for this semester
-        // You can implement this based on your available subjects list per semester
-        return true; // Placeholder: Implement subject availability check
+        // Placeholder: Validate subjects offered this semester
+        return true;
     }
 
     private boolean failedPrerequisitesNotRetaken(Chromosome chromosome, List<Subject> failedSubjects, List<Subject> completedSubjects) {
@@ -80,8 +80,8 @@ public class FitnessFunction {
     }
 
     private boolean followsOriginalPlan(Chromosome chromosome) {
-        // Check how much of the original plan is maintained in this chromosome
-        return true; // Placeholder: Implement original plan validation
+        // Placeholder: Validate plan adherence
+        return true;
     }
 
     private boolean retakesFailedSubjects(Chromosome chromosome, List<Subject> failedSubjects) {
@@ -95,11 +95,11 @@ public class FitnessFunction {
 
     private boolean prioritizesCoreSubjects(Chromosome chromosome) {
         long coreCount = chromosome.getSubjects().stream().filter(Subject::isCoreSubject).count();
-        return coreCount > (chromosome.getSubjects().size() / 2); // More than half core subjects
+        return coreCount > (chromosome.getSubjects().size() / 2);
     }
 
     private boolean yearSpecificSubjects(Chromosome chromosome) {
-        // Check that subjects are appropriate for the student's year
-        return true; // Placeholder: Implement year-specific subject logic
+        // Placeholder: Validate year-specific subjects
+        return true;
     }
 }

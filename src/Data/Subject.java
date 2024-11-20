@@ -70,7 +70,6 @@ public class Subject {
     public static final Subject MPU3213 = new Subject("MPU3213", "Malay Language for Communication 2", 3, new String[]{}, false);
     public static final Subject KIAR = new Subject("KIAR", "Integrity and Anti-Corruption", 2, new String[]{}, false);
     public static final Subject ENG2042 = new Subject("ENG2042", "Communication Skills for Professional Practice", 2, new String[]{}, false);
-    public static final Subject MPU3312 = new Subject("MPU3312", "Sustainable Development in Malaysia", 2, new String[]{}, false);
 
     // ******** Computing Electives ******** //
     public static final Subject CSC2044 = new Subject("CSC2044", "Concurrent Programming", 4, new String[]{}, true);
@@ -101,14 +100,15 @@ public class Subject {
     // Additional Math subject
     public static final Subject MAT1013 = new Subject("MAT1013", "Micro-Credential in Computer Mathematics Fundamentals", 3, new String[]{}, true);
 
-    // Dummy Electives
-    public static Subject FreeElective1;
-    public static Subject FreeElective2;
-    public static Subject FreeElective3;
-    public static Subject Elective1;
-    public static Subject Elective2;
-    public static Subject Elective3;
-    public static Subject Elective4;
+    // ******** Dummy Electives ******** //
+    public static Subject FreeElective1 = new Subject("FreeElective1", "Placeholder Free Elective 1", 3, new String[]{}, false);
+    public static Subject FreeElective2 = new Subject("FreeElective2", "Placeholder Free Elective 2", 3, new String[]{}, false);
+    public static Subject FreeElective3 = new Subject("FreeElective3", "Placeholder Free Elective 3", 3, new String[]{}, false);
+    public static Subject Elective1 = new Subject("Elective1", "Placeholder Elective 1", 3, new String[]{}, true);
+    public static Subject Elective2 = new Subject("Elective2", "Placeholder Elective 2", 3, new String[]{}, true);
+    public static Subject Elective3 = new Subject("Elective3", "Placeholder Elective 3", 3, new String[]{}, true);
+    public static Subject Elective4 = new Subject("Elective4", "Placeholder Elective 4", 3, new String[]{}, true);
+
 
     // Methods to Set Electives Dynamically
     public static void setElectivesForSemester(String elective, Subject subject) {

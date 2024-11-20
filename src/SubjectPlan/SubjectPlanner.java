@@ -4,6 +4,7 @@ import Data.Chromosome;
 import Data.Population;
 import Data.Student;
 import Data.Subject;
+import Operators.GeneticAlgorithm;
 
 import java.util.ArrayList;
 import java.util.List;

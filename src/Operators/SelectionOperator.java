@@ -4,6 +4,7 @@ import Data.Chromosome;
 import Data.Population;
 
 public class SelectionOperator {
+
     public Chromosome select(Population population) {
         int totalFitness = population.getTotalFitness();
         int randomValue = (int) (Math.random() * totalFitness);
@@ -16,8 +17,7 @@ public class SelectionOperator {
             }
         }
 
-        // Return the first chromosome as a fallback (should rarely happen)
+        // Return the first chromosome as a fallback
         return population.getChromosomes().get(0);
     }
 }
-

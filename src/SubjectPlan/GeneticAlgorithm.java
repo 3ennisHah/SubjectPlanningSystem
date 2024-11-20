@@ -1,64 +1,66 @@
-package SubjectPlan;
+package Operators;
 
 import Data.Chromosome;
 import Data.Population;
+import Data.Student;
 import Data.Subject;
-import Operators.CrossoverOperator;
-import Operators.FitnessFunction;
-import Operators.MutationOperator;
-import Operators.SelectionOperator;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class GeneticAlgorithm {
-    private SelectionOperator selectionOperator;
-    private CrossoverOperator crossoverOperator;
-    private MutationOperator mutationOperator;
-    private FitnessFunction fitnessFunction;
+    private final FitnessFunction fitnessFunction;
 
     public GeneticAlgorithm() {
-        this.selectionOperator = new SelectionOperator();
-        this.crossoverOperator = new CrossoverOperator();
-        this.mutationOperator = new MutationOperator();
         this.fitnessFunction = new FitnessFunction();
     }
 
     public Population initializePopulation(List<Chromosome> initialChromosomes) {
-        Population population = new Population(initialChromosomes);
-        for (Chromosome chromosome : population.getChromosomes()) {
-            fitnessFunction.calculateFitness(chromosome);
-        }
-        return population;
+        return new Population(initialChromosomes);
     }
 
     public Chromosome evolve(Population population, List<Subject> availableSubjects, List<Subject> completedSubjects) {
-        Chromosome bestChromosome = null;
+        for (int generation = 0; generation < 100; generation++) { // Evolve for 100 generations
+            Population newPopulation = new Population(new ArrayList<>());
 
-        for (int generation = 0; generation < 50; generation++) {
-            List<Chromosome> newChromosomes = new ArrayList<>();
+            for (int i = 0; i < population.size(); i++) {
+                Chromosome parent1 = population.select();
+                Chromosome parent2 = population.select();
 
-            for (int j = 0; j < population.getChromosomes().size(); j++) {
-                Chromosome parent1 = selectionOperator.select(population);
-                Chromosome parent2 = selectionOperator.select(population);
+                Chromosome child = crossover(parent1, parent2);
+                mutate(child, availableSubjects, completedSubjects);
 
-                Chromosome child = crossoverOperator.crossover(parent1, parent2, completedSubjects);
-                mutationOperator.mutate(child, availableSubjects, completedSubjects);
-                fitnessFunction.calculateFitness(child);
+                int fitness = fitnessFunction.calculateFitness(child, completedSubjects, new ArrayList<>(), 19);
+                child.setFitness(fitness);
 
-                newChromosomes.add(child);
+                newPopulation.addChromosome(child);
             }
 
-            population = new Population(newChromosomes);
-            Chromosome currentBest = population.getFittest();
-            if (bestChromosome == null || currentBest.getFitness() > bestChromosome.getFitness()) {
-                bestChromosome = currentBest;
-            }
-
-            // Print current generation details
-            System.out.println("Generation " + (generation + 1) + " Best Fitness: " + currentBest.getFitness());
+            population = newPopulation;
         }
 
-        return bestChromosome;
+        return population.getFittest();
+    }
+
+    private Chromosome crossover(Chromosome parent1, Chromosome parent2) {
+        List<Subject> childSubjects = new ArrayList<>(parent1.getSubjects());
+        for (Subject subject : parent2.getSubjects()) {
+            if (!childSubjects.contains(subject)) {
+                childSubjects.add(subject);
+            }
+        }
+        return new Chromosome(childSubjects);
+    }
+
+    private void mutate(Chromosome chromosome, List<Subject> availableSubjects, List<Subject> completedSubjects) {
+        List<Subject> subjects = chromosome.getSubjects();
+        if (subjects.isEmpty()) return;
+
+        int indexToReplace = (int) (Math.random() * subjects.size());
+        Subject randomSubject = availableSubjects.get((int) (Math.random() * availableSubjects.size()));
+
+        if (!completedSubjects.contains(randomSubject) && !subjects.contains(randomSubject)) {
+            subjects.set(indexToReplace, randomSubject);
+        }
     }
 }
