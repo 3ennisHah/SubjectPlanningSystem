@@ -2,6 +2,7 @@ package Data;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class Student {
     private String studentId;
@@ -87,6 +88,17 @@ public class Student {
                 .anyMatch(subject -> subject.getSubjectCode().equals(subjectCode));
     }
 
+    public boolean hasPerfectRecord(Map<String, List<Subject>> baseLineup) {
+        for (List<Subject> semester : baseLineup.values()) {
+            for (Subject subject : semester) {
+                if (!completedSubjects.contains(subject)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     @Override
     public String toString() {
         return "Student{" +
@@ -106,7 +118,7 @@ public class Student {
         List<Student> students = new ArrayList<>();
 
         // Student 1: Perfect Student
-        Student student1 = new Student("S1001", "Alice Perfect");
+        Student student1 = new Student("21345678", "Ah Meng");
         student1.addCompletedSubject(Subject.CSC1024);
         student1.addCompletedSubject(Subject.CSC1202);
         student1.addCompletedSubject(Subject.MTH1114);

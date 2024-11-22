@@ -2,20 +2,21 @@ package Data;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class Chromosome {
-    private List<Subject> subjects;
+    private List<List<Subject>> semesterPlan;
     private int fitness;
-    private static final int MAX_CREDITS = 19; // Maximum credits per semester
 
-    public Chromosome(List<Subject> subjects) {
-        this.subjects = new ArrayList<>(subjects);
+    public Chromosome(List<List<Subject>> semesterPlan) {
+        this.semesterPlan = new ArrayList<>();
+        for (List<Subject> semester : semesterPlan) {
+            this.semesterPlan.add(new ArrayList<>(semester));
+        }
         this.fitness = 0;
     }
 
-    public List<Subject> getSubjects() {
-        return subjects;
+    public List<List<Subject>> getSemesterPlan() {
+        return semesterPlan;
     }
 
     public int getFitness() {
@@ -27,39 +28,9 @@ public class Chromosome {
     }
 
     public int getTotalCreditHours() {
-        return subjects.stream().mapToInt(Subject::getCreditHours).sum();
-    }
-
-    public boolean hasCompletedSubject(String subjectCode) {
-        return subjects.stream().anyMatch(subject -> subject.getSubjectCode().equals(subjectCode));
-    }
-
-    public void filterCompletedSubjects(List<Subject> completedSubjects) {
-        subjects = subjects.stream()
-                .filter(subject -> completedSubjects.stream()
-                        .noneMatch(completed -> completed.getSubjectCode().equals(subject.getSubjectCode())))
-                .collect(Collectors.toList());
-    }
-
-    public void addSubject(Subject subject) {
-        if (!subjects.contains(subject)) {
-            subjects.add(subject);
-        }
-    }
-
-    public boolean exceedsCreditLimit() {
-        return getTotalCreditHours() > MAX_CREDITS;
-    }
-
-    public boolean containsSubject(String subjectCode) {
-        return subjects.stream().anyMatch(subject -> subject.getSubjectCode().equals(subjectCode));
-    }
-
-    @Override
-    public String toString() {
-        return "Chromosome{" +
-                "subjects=" + subjects +
-                ", fitness=" + fitness +
-                '}';
+        return semesterPlan.stream()
+                .flatMap(List::stream)
+                .mapToInt(Subject::getCreditHours)
+                .sum();
     }
 }

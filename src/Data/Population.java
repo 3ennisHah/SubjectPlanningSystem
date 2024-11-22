@@ -27,6 +27,11 @@ public class Population {
 
     public Chromosome select() {
         int totalFitness = getTotalFitness();
+        if (totalFitness == 0) {
+            // Return a random chromosome if all fitness values are 0
+            return chromosomes.get(new Random().nextInt(chromosomes.size()));
+        }
+
         int randomValue = new Random().nextInt(totalFitness);
         int cumulativeFitness = 0;
 

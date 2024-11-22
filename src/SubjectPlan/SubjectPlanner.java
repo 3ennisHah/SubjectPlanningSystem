@@ -1,40 +1,51 @@
 package SubjectPlan;
 
-import Data.Chromosome;
-import Data.Population;
-import Data.Student;
-import Data.Subject;
-import Operators.GeneticAlgorithm;
+import Data.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class SubjectPlanner {
-    private GeneticAlgorithm ga;
+    private final GeneticAlgorithm geneticAlgorithm;
 
     public SubjectPlanner() {
-        this.ga = new GeneticAlgorithm();
+        this.geneticAlgorithm = new GeneticAlgorithm();
     }
 
-    public void planSubjects(String cohort, Student student, List<Subject> availableSubjects) {
-        List<Chromosome> initialChromosomes = new ArrayList<>();
+    public List<List<Subject>> planSubjects(Student student) {
+        // Get the cohort key
+        String cohortKey = student.getEnrollmentYear() + student.getEnrollmentIntake();
 
-        for (int i = 0; i < 10; i++) {  // Generate diverse initial chromosomes
-            List<Subject> randomSubjects = new ArrayList<>();
-            while (randomSubjects.size() < 5) {
-                Subject randomSubject = availableSubjects.get((int) (Math.random() * availableSubjects.size()));
-                if (!randomSubjects.contains(randomSubject) &&
-                        student.getCompletedSubjects().stream().noneMatch(s -> s.getSubjectCode().equals(randomSubject.getSubjectCode()))) {
-                    randomSubjects.add(randomSubject);
-                }
-            }
-            initialChromosomes.add(new Chromosome(randomSubjects));
+        // Retrieve the base lineup for the cohort
+        List<List<Subject>> baseLineup = LineupManager.getAllSubjectsForCohort(cohortKey);
+
+        if (baseLineup == null || baseLineup.isEmpty()) {
+            throw new IllegalArgumentException("No subject lineup found for cohort: " + cohortKey);
         }
 
-        Population population = ga.initializePopulation(initialChromosomes);
-        Chromosome bestPlan = ga.evolve(population, availableSubjects, student.getCompletedSubjects());
+        // Check if the student is a "perfect" student
+        if (isPerfectStudent(student, baseLineup)) {
+            System.out.println("Perfect fitness detected. Returning base lineup.");
+            return baseLineup;
+        }
 
-        System.out.println("Best plan for " + student.getName() + ":");
-        System.out.println(bestPlan);
+        // Initialize the population using Genetic Algorithm
+        Population population = geneticAlgorithm.initializePopulation(baseLineup, student);
+
+        // Evolve to find the best chromosome
+        Chromosome bestPlan = geneticAlgorithm.evolve(population, student, 19, 10);
+
+        // Return the semester plan from the best chromosome
+        return bestPlan.getSemesterPlan();
+    }
+
+    private boolean isPerfectStudent(Student student, List<List<Subject>> baseLineup) {
+        for (List<Subject> semester : baseLineup) {
+            for (Subject subject : semester) {
+                if (!student.hasCompleted(subject.getSubjectCode())) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }

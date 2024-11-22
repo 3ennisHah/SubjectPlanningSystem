@@ -4,24 +4,24 @@ import Data.Chromosome;
 import Data.Subject;
 
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.Random;
 
 public class MutationOperator {
+    public void mutate(Chromosome chromosome, List<Subject> availableSubjects) {
+        Random random = new Random();
+        List<List<Subject>> semesterPlan = chromosome.getSemesterPlan();
 
-    public void mutate(Chromosome chromosome, List<Subject> availableSubjects, List<Subject> completedSubjects) {
-        List<Subject> subjects = chromosome.getSubjects();
-        Set<String> currentSubjectCodes = subjects.stream()
-                .map(Subject::getSubjectCode)
-                .collect(Collectors.toSet());
+        if (semesterPlan.isEmpty()) return;
 
-        int index = (int) (Math.random() * subjects.size());
-        Subject newSubject = availableSubjects.get((int) (Math.random() * availableSubjects.size()));
+        int semesterIndex = random.nextInt(semesterPlan.size());
+        List<Subject> semester = semesterPlan.get(semesterIndex);
 
-        // Replace with a new valid subject
-        if (!currentSubjectCodes.contains(newSubject.getSubjectCode()) &&
-                completedSubjects.stream().noneMatch(c -> c.getSubjectCode().equals(newSubject.getSubjectCode()))) {
-            subjects.set(index, newSubject);
-        }
+        if (semester.isEmpty()) return;
+
+        int subjectIndex = random.nextInt(semester.size());
+        Subject randomSubject = availableSubjects.get(random.nextInt(availableSubjects.size()));
+
+        // Replace with a random subject if valid
+        semester.set(subjectIndex, randomSubject);
     }
 }

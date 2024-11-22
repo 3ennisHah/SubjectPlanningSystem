@@ -70,6 +70,8 @@ public class Subject {
     public static final Subject MPU3213 = new Subject("MPU3213", "Malay Language for Communication 2", 3, new String[]{}, false);
     public static final Subject KIAR = new Subject("KIAR", "Integrity and Anti-Corruption", 2, new String[]{}, false);
     public static final Subject ENG2042 = new Subject("ENG2042", "Communication Skills for Professional Practice", 2, new String[]{}, false);
+    public static final Subject MPU3312 = new Subject("MPU3312", "Sustainable Development in Malaysia", 2, new String[]{}, false);
+    public static final Subject BIS2212 = new Subject("BIS2212", "Social & Professional Responsibilities", 2, new String[]{}, false);
 
     // ******** Computing Electives ******** //
     public static final Subject CSC2044 = new Subject("CSC2044", "Concurrent Programming", 4, new String[]{}, true);
@@ -93,8 +95,7 @@ public class Subject {
     public static final Subject PSY2164 = new Subject("PSY2164", "Introduction to Psychology", 4, new String[]{}, false);
     public static final Subject MKT2224 = new Subject("MKT2224", "Principles of Marketing", 4, new String[]{}, false);
     public static final Subject ENT2114 = new Subject("ENT2114", "Principles of Entrepreneurship", 4, new String[]{}, false);
-    public static final Subject MPU3312 = new Subject("MPU3312", "Sustainable Development in Malaysia", 2, new String[]{}, false);
-    public static final Subject BIS2212 = new Subject("BIS2212", "Social & Professional Responsibilities", 2, new String[]{}, false);
+
 
 
     // Additional Math subject
