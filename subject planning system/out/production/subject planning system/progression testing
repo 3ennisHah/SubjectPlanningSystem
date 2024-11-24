@@ -1,0 +1,22 @@
+package Data
+
+case class ProgressionDataset(pass: Double, total: Double, year1Avg: Double, year2Avg: Double, year3Avg: Double, overallAvg: Double){
+  def percentage = pass / total
+}
+case class ProgressionSheetResult (sheetName: String, cohorts: Seq[String], years: Seq[Int], data: Map[Int, Map[String, ProgressionDataset]]){
+
+}
+
+case class SubjectDataset( pass1: Option[Double], passR: Option[Double])
+
+case class SubjectSheetResult (sheetName: String, subjects: Seq[ModuleDesc], years: Seq[Int], data: Map[Int, Map[Int, Map[String, SubjectDataset]]]){
+
+}
+
+case class RawDataset( cohort: String, year: String, isDirect: Boolean, studentID: String, subjectCode: String, isPass: Option[Boolean], overall: Option[Double], country: String, qualification: String, gender: String, studentName: String, month: String, cw: Option[Double], exam: Option[Double],
+                       isFirstPass: Option[Boolean], isFirstTime: Option[Boolean], qualificationData: String, isExempted: Boolean, isTransfer: Boolean) {
+
+}
+
+case class RawDataSheetResult (sheetName: String, data: Seq[ RawDataset])
+

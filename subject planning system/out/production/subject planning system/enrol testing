@@ -1,0 +1,31 @@
+package Data;
+
+import com.hep88.BoardsheetAnalysis.util.ProcessingHelper
+import com.hep88.BoardsheetAnalysis.util.ProcessingHelper.calculateEndYear
+
+case class ClassificationDataset(class1: Double, class2one: Double, class2two: Double, class3: Double, totalSudent: Int){
+
+}
+case class ClassificationDatasetV2(class1: Double, class2one: Double, class2two: Double, class3: Double, pass: Double, fail: Double, unknown: Double, totalSudent: Int){
+
+}
+case class ClassificationSheetResult (sheetName: String, cohorts: Seq[String], data: Map[String, ClassificationDataset])
+
+case class ClassificationSheetResultV2 (sheetName: String, cohorts: Seq[String], data: Map[String, ClassificationDatasetV2])
+
+case class AttritionDataset(active: Double, graduated: Double, attrition: Double, transferOut: Double, defer: Double, notEnrol: Double, total: Double)
+
+case class AttritionSheetResult (sheetName: String, years: Seq[String], data: Map[String, AttritionDataset])
+
+
+case class RawAttritionDataset(cohort: String, sem: Int, id: String, name: String, isGraduated: Boolean,
+                               isActive: Boolean, status: String, award: String, cavg: Double, isDirect: Boolean, qualification: String, country: String, ic: String, qualificationValue: String="", qualificationData: String = ""){
+  def year: Int = calculateEndYear(cohort.take(4).toInt,cohort.takeRight(2).toInt, sem)
+}
+
+case class RawAttritionSheetResult (sheetName: String,  data: Seq[ RawAttritionDataset])
+
+case class EnrollmentStatDataSet(direct: Int, nodirect: Int, directNonCon: Double, nondirectNonCon: Double, total: Int)
+
+case class EnrollmentStatSheetResult(sheetName: String, years: Seq[String], data: Map[String, EnrollmentStatDataSet])
+
