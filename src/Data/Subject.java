@@ -4,19 +4,26 @@ public class Subject {
     private String subjectCode;
     private String subjectName;
     private int creditHours;
-    private String[] prerequisites;
-    private boolean isCore;
+    private String[] prerequisites; // Prerequisite subject codes
+    private boolean isCore; // Indicates if the subject is core or elective
+    private String name;
 
-    public Subject(String subjectCode, String subjectName, int creditHours, String[] prerequisites, boolean isCore) {
+    // Constructor
+    public Subject(String subjectCode, String name, int creditHours, String[] prerequisites, boolean isCore) {
         this.subjectCode = subjectCode;
-        this.subjectName = subjectName;
+        this.name = name;
         this.creditHours = creditHours;
         this.prerequisites = prerequisites;
         this.isCore = isCore;
     }
 
+    // Getters
     public String getSubjectCode() {
         return subjectCode;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public String getSubjectName() {
@@ -31,13 +38,18 @@ public class Subject {
         return prerequisites;
     }
 
-    public boolean isCoreSubject() {
+    public boolean isCore() {
         return isCore;
+    }
+
+    // Check if this subject has a prerequisite
+    public boolean hasPrerequisite() {
+        return prerequisites.length > 0;
     }
 
     @Override
     public String toString() {
-        return subjectName + " (" + subjectCode + ")";
+        return name + " (" + subjectCode + ")";
     }
 
     // ******** Core Subjects ******** //
@@ -65,41 +77,9 @@ public class Subject {
     public static final Subject NET3204 = new Subject("NET3204", "Distributed Systems", 4, new String[]{}, true);
     public static final Subject PRJ3223 = new Subject("PRJ3223", "Capstone Project 2", 3, new String[]{}, true);
     public static final Subject CSC3024 = new Subject("CSC3024", "Human Computer Interaction", 4, new String[]{}, true);
-    public static final Subject NET2201 = new Subject("NET2201", "Computer Networks", 4, new String[]{}, true);
     public static final Subject MPU3183 = new Subject("MPU3183", "Penghayatan Etika dan Peradaban", 3, new String[]{}, false);
     public static final Subject MPU3213 = new Subject("MPU3213", "Malay Language for Communication 2", 3, new String[]{}, false);
     public static final Subject KIAR = new Subject("KIAR", "Integrity and Anti-Corruption", 2, new String[]{}, false);
-    public static final Subject ENG2042 = new Subject("ENG2042", "Communication Skills for Professional Practice", 2, new String[]{}, false);
-    public static final Subject MPU3312 = new Subject("MPU3312", "Sustainable Development in Malaysia", 2, new String[]{}, false);
-    public static final Subject BIS2212 = new Subject("BIS2212", "Social & Professional Responsibilities", 2, new String[]{}, false);
-
-    // ******** Computing Electives ******** //
-    public static final Subject CSC2044 = new Subject("CSC2044", "Concurrent Programming", 4, new String[]{}, true);
-    public static final Subject SEG2102 = new Subject("SEG2102", "Database Management Systems", 4, new String[]{}, true);
-    public static final Subject BIS2216 = new Subject("BIS2216", "Data Mining and Knowledge Discovery Fundamentals", 4, new String[]{}, true);
-    public static final Subject PRG2214 = new Subject("PRG2214", "Functional Programming Principles", 4, new String[]{}, true);
-    public static final Subject NET2102 = new Subject("NET2102", "Data Communications", 4, new String[]{}, true);
-    public static final Subject IST2334 = new Subject("IST2334", "Web and Network Analytics", 4, new String[]{}, true);
-    public static final Subject CSC3044 = new Subject("CSC3044", "Computer Security", 4, new String[]{}, true);
-    public static final Subject CSC3014 = new Subject("CSC3014", "Computer Vision", 4, new String[]{}, true);
-    public static final Subject CSC3209 = new Subject("CSC3209", "Software Architecture and Design Patterns", 4, new String[]{}, true);
-    public static final Subject CSC3034 = new Subject("CSC3034", "Computational Intelligence", 4, new String[]{}, true);
-    public static final Subject CSC3064 = new Subject("CSC3064", "Database Engineering", 4, new String[]{}, true);
-    public static final Subject PRG2205 = new Subject("PRG2205", "Programming Languages", 4, new String[]{}, true);
-    public static final Subject PRG3014 = new Subject("PRG3014", "UI/UX Design and Development", 4, new String[]{}, true);
-
-
-    // ******** Non-Computing (Free) Electives ******** //
-    public static final Subject DECN2014 = new Subject("DECN2014", "Digital Economy", 4, new String[]{}, false);
-    public static final Subject ETP2014 = new Subject("ETP2014", "StartUp Foundry", 4, new String[]{}, false);
-    public static final Subject PSY2164 = new Subject("PSY2164", "Introduction to Psychology", 4, new String[]{}, false);
-    public static final Subject MKT2224 = new Subject("MKT2224", "Principles of Marketing", 4, new String[]{}, false);
-    public static final Subject ENT2114 = new Subject("ENT2114", "Principles of Entrepreneurship", 4, new String[]{}, false);
-
-
-
-    // Additional Math subject
-    public static final Subject MAT1013 = new Subject("MAT1013", "Micro-Credential in Computer Mathematics Fundamentals", 3, new String[]{}, true);
 
     // ******** Dummy Electives ******** //
     public static Subject FreeElective1 = new Subject("FreeElective1", "Placeholder Free Elective 1", 3, new String[]{}, false);
@@ -110,8 +90,7 @@ public class Subject {
     public static Subject Elective3 = new Subject("Elective3", "Placeholder Elective 3", 3, new String[]{}, true);
     public static Subject Elective4 = new Subject("Elective4", "Placeholder Elective 4", 3, new String[]{}, true);
 
-
-    // Methods to Set Electives Dynamically
+    // Method to Set Electives Dynamically
     public static void setElectivesForSemester(String elective, Subject subject) {
         switch (elective) {
             case "FreeElective1":

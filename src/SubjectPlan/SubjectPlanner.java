@@ -1,8 +1,11 @@
 package SubjectPlan;
 
 import Data.*;
+import Operators.GeneticAlgorithm;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class SubjectPlanner {
     private final GeneticAlgorithm geneticAlgorithm;
@@ -12,40 +15,23 @@ public class SubjectPlanner {
     }
 
     public List<List<Subject>> planSubjects(Student student) {
-        // Get the cohort key
-        String cohortKey = student.getEnrollmentYear() + student.getEnrollmentIntake();
+        String cohortKey = "BCS" + student.getEnrollmentYear() + student.getEnrollmentIntake();
+        Map<String, List<Subject>> lineup = LineupManager.getLineupForCohort(cohortKey);
 
-        // Retrieve the base lineup for the cohort
-        List<List<Subject>> baseLineup = LineupManager.getAllSubjectsForCohort(cohortKey);
-
-        if (baseLineup == null || baseLineup.isEmpty()) {
+        if (lineup == null) {
             throw new IllegalArgumentException("No subject lineup found for cohort: " + cohortKey);
         }
 
-        // Check if the student is a "perfect" student
-        if (isPerfectStudent(student, baseLineup)) {
+        List<List<Subject>> basePlan = new ArrayList<>(lineup.values());
+        Chromosome baseChromosome = new Chromosome(basePlan);
+
+        int fitnessScore = geneticAlgorithm.calculateFitness(baseChromosome, student, 19, 10);
+        if (fitnessScore == 100) {
             System.out.println("Perfect fitness detected. Returning base lineup.");
-            return baseLineup;
+            return basePlan;
         }
 
-        // Initialize the population using Genetic Algorithm
-        Population population = geneticAlgorithm.initializePopulation(baseLineup, student);
-
-        // Evolve to find the best chromosome
-        Chromosome bestPlan = geneticAlgorithm.evolve(population, student, 19, 10);
-
-        // Return the semester plan from the best chromosome
-        return bestPlan.getSemesterPlan();
-    }
-
-    private boolean isPerfectStudent(Student student, List<List<Subject>> baseLineup) {
-        for (List<Subject> semester : baseLineup) {
-            for (Subject subject : semester) {
-                if (!student.hasCompleted(subject.getSubjectCode())) {
-                    return false;
-                }
-            }
-        }
-        return true;
+        Chromosome optimizedChromosome = geneticAlgorithm.evolve(basePlan, student, 19, 10);
+        return optimizedChromosome.getSemesterPlan();
     }
 }

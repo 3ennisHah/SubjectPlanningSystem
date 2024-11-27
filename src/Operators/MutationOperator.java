@@ -7,21 +7,25 @@ import java.util.List;
 import java.util.Random;
 
 public class MutationOperator {
-    public void mutate(Chromosome chromosome, List<Subject> availableSubjects) {
+    private static final double MUTATION_RATE = 0.1;
+
+    public void mutate(Chromosome chromosome, List<List<Subject>> basePlan, List<Subject> allSubjects) {
         Random random = new Random();
-        List<List<Subject>> semesterPlan = chromosome.getSemesterPlan();
 
-        if (semesterPlan.isEmpty()) return;
+        if (random.nextDouble() < MUTATION_RATE) {
+            List<List<Subject>> semesterPlan = chromosome.getSemesterPlan();
 
-        int semesterIndex = random.nextInt(semesterPlan.size());
-        List<Subject> semester = semesterPlan.get(semesterIndex);
+            // Randomly select a semester
+            int semesterIndex = random.nextInt(semesterPlan.size());
+            List<Subject> semester = semesterPlan.get(semesterIndex);
 
-        if (semester.isEmpty()) return;
+            if (!semester.isEmpty()) {
+                // Randomly replace a subject in the semester
+                int subjectIndex = random.nextInt(semester.size());
+                Subject randomSubject = allSubjects.get(random.nextInt(allSubjects.size()));
 
-        int subjectIndex = random.nextInt(semester.size());
-        Subject randomSubject = availableSubjects.get(random.nextInt(availableSubjects.size()));
-
-        // Replace with a random subject if valid
-        semester.set(subjectIndex, randomSubject);
+                semester.set(subjectIndex, randomSubject);
+            }
+        }
     }
 }

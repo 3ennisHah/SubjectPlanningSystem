@@ -3,6 +3,8 @@ package Data;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class Student {
     private String studentId;
@@ -99,6 +101,13 @@ public class Student {
         return true;
     }
 
+    public Set<String> getCompletedSubjectCodes() {
+        return completedSubjects.stream()
+                .map(Subject::getSubjectCode)
+                .collect(Collectors.toSet());
+    }
+
+
     @Override
     public String toString() {
         return "Student{" +
@@ -114,51 +123,45 @@ public class Student {
     }
 
     // Example Students
-    public static List<Student> getExampleStudents() {
-        List<Student> students = new ArrayList<>();
+    public static Student getStudentByChoice(int choice) {
+        Student student = null;
 
-        // Student 1: Perfect Student
-        Student student1 = new Student("21345678", "Ah Meng");
-        student1.addCompletedSubject(Subject.CSC1024);
-        student1.addCompletedSubject(Subject.CSC1202);
-        student1.addCompletedSubject(Subject.MTH1114);
-        student1.addCompletedSubject(Subject.PRG1203);
-        student1.addCompletedSubject(Subject.NET1014);
-        student1.addCompletedSubject(Subject.SEG1201);
-        student1.addCompletedSubject(Subject.CSC2104);
-        student1.setDirectEntry(false);
-        student1.setMathRequirement(true);
-        student1.setEnrollmentYear("2024");
-        student1.setEnrollmentIntake("January");
-        students.add(student1);
+        switch (choice) {
+            case 1:
+                student = new Student("S1001", "Alice Perfect");
+                student.setEnrollmentYear("2024");
+                student.setEnrollmentIntake("January");
+                student.addCompletedSubject(Subject.CSC1024);
+                student.addCompletedSubject(Subject.CSC1202);
+                student.addCompletedSubject(Subject.MTH1114);
+                student.addCompletedSubject(Subject.PRG1203);
+                student.addCompletedSubject(Subject.NET1014);
+                student.addCompletedSubject(Subject.SEG1201);
+                student.addCompletedSubject(Subject.CSC2104);
+                break;
+            case 2:
+                student = new Student("S1002", "Bob NoMath");
+                student.setEnrollmentYear("2024");
+                student.setEnrollmentIntake("MathMarch");
+                student.addCompletedSubject(Subject.CSC1024);
+                student.addCompletedSubject(Subject.CSC1202);
+                student.addFailedSubject(Subject.MTH1114);
+                break;
+            case 3:
+                student = new Student("S1003", "Charlie Retry");
+                student.setEnrollmentYear("2024");
+                student.setEnrollmentIntake("August");
+                student.addCompletedSubject(Subject.CSC1024);
+                student.addCompletedSubject(Subject.CSC1202);
+                student.addCompletedSubject(Subject.MTH1114);
+                student.addCompletedSubject(Subject.PRG1203);
+                student.addFailedSubject(Subject.CSC2104);
+                break;
+            default:
+                System.out.println("Invalid choice. Please select 1, 2, or 3.");
+                System.exit(1);
+        }
 
-        // Student 2: No Math Background
-        Student student2 = new Student("S1002", "Bob NoMath");
-        student2.addCompletedSubject(Subject.CSC1024);
-        student2.addCompletedSubject(Subject.CSC1202);
-        student2.addCompletedSubject(Subject.PRG1203);
-        student2.addCompletedSubject(Subject.NET1014);
-        student2.addFailedSubject(Subject.MTH1114);
-        student2.setDirectEntry(false);
-        student2.setMathRequirement(false);
-        student2.setEnrollmentYear("2024");
-        student2.setEnrollmentIntake("March");
-        students.add(student2);
-
-        // Student 3: Failed a Subject
-        Student student3 = new Student("S1003", "Charlie Retry");
-        student3.addCompletedSubject(Subject.CSC1024);
-        student3.addCompletedSubject(Subject.CSC1202);
-        student3.addCompletedSubject(Subject.MTH1114);
-        student3.addCompletedSubject(Subject.PRG1203);
-        student3.addCompletedSubject(Subject.NET1014);
-        student3.addFailedSubject(Subject.CSC2104);
-        student3.setDirectEntry(true);
-        student3.setMathRequirement(true);
-        student3.setEnrollmentYear("2024");
-        student3.setEnrollmentIntake("August");
-        students.add(student3);
-
-        return students;
+        return student;
     }
 }

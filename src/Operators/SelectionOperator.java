@@ -3,13 +3,15 @@ package Operators;
 import Data.Chromosome;
 import Data.Population;
 
-public class SelectionOperator {
+import java.util.Random;
 
+public class SelectionOperator {
     public Chromosome select(Population population) {
         int totalFitness = population.getTotalFitness();
-        int randomValue = (int) (Math.random() * totalFitness);
-
+        Random random = new Random();
+        int randomValue = random.nextInt(totalFitness);
         int cumulativeFitness = 0;
+
         for (Chromosome chromosome : population.getChromosomes()) {
             cumulativeFitness += chromosome.getFitness();
             if (cumulativeFitness >= randomValue) {
