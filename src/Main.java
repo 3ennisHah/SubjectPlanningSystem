@@ -10,7 +10,6 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         SubjectPlanner subjectPlanner = new SubjectPlanner();
-        Scanner scanner = new Scanner(System.in);
 
         System.out.println("Select a student to display their subject plan:");
         System.out.println("1. Alice Perfect (2024 January Intake)");
@@ -18,14 +17,12 @@ public class Main {
         System.out.println("3. Charlie Retry (2024 August Intake)");
         System.out.print("Enter your choice (1/2/3): ");
 
+        Scanner scanner = new Scanner(System.in);
         int choice = scanner.nextInt();
-        Student selectedStudent = Student.getStudentByChoice(choice);
+
+        Student selectedStudent = Student.getStudentByChoice(choice, null); // Provide base lineup if necessary
 
         try {
-            System.out.println("Generated cohort key: " + selectedStudent.getEnrollmentYear() + selectedStudent.getEnrollmentIntake());
-            System.out.println("Successfully retrieved lineup for cohort.");
-            System.out.println("Planning subjects for: " + selectedStudent.getName());
-
             List<List<Subject>> subjectPlan = subjectPlanner.planSubjects(selectedStudent);
 
             System.out.println("Complete Subject Plan for " + selectedStudent.getName() + ":");
@@ -33,7 +30,7 @@ public class Main {
                 System.out.println("Semester " + (i + 1) + ": " + subjectPlan.get(i));
             }
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("Error: " + e.getMessage());
         }
     }
 }

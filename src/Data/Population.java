@@ -2,7 +2,6 @@ package Data;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class Population {
     private final List<Chromosome> chromosomes;
@@ -15,37 +14,14 @@ public class Population {
         return chromosomes;
     }
 
-    public void addChromosome(Chromosome chromosome) {
-        chromosomes.add(chromosome);
-    }
-
     public Chromosome getFittest() {
         return chromosomes.stream()
                 .max((c1, c2) -> Integer.compare(c1.getFitness(), c2.getFitness()))
                 .orElse(null);
     }
 
-    public Chromosome select() {
-        int totalFitness = getTotalFitness();
-        if (totalFitness == 0) {
-            // Return a random chromosome if all fitness values are 0
-            return chromosomes.get(new Random().nextInt(chromosomes.size()));
-        }
-
-        int randomValue = new Random().nextInt(totalFitness);
-        int cumulativeFitness = 0;
-
-        for (Chromosome chromosome : chromosomes) {
-            cumulativeFitness += chromosome.getFitness();
-            if (cumulativeFitness >= randomValue) {
-                return chromosome;
-            }
-        }
-        return chromosomes.get(0); // Default fallback
-    }
-
-    public int size() {
-        return chromosomes.size();
+    public void addChromosome(Chromosome chromosome) {
+        chromosomes.add(chromosome);
     }
 
     public int getTotalFitness() {

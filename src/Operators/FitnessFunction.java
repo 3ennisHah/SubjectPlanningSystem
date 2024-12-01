@@ -4,55 +4,46 @@ import Data.Chromosome;
 import Data.Student;
 import Data.Subject;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class FitnessFunction {
-    public int calculateFitness(Chromosome chromosome, Student student, int maxCredits, int shortSemesterCredits) {
+    private static final int SHORT_SEMESTER_MAX_CREDITS = 10;
+    private static final int LONG_SEMESTER_MAX_CREDITS = 19;
+
+    public int calculateFitness(Chromosome chromosome, Student student) {
         List<List<Subject>> semesterPlan = chromosome.getSemesterPlan();
-        int fitness = 100;
+        int fitness = 100; // Start with a base score
+        Set<Subject> allSubjects = new HashSet<>();
 
         for (int i = 0; i < semesterPlan.size(); i++) {
             List<Subject> semester = semesterPlan.get(i);
             int totalCredits = semester.stream().mapToInt(Subject::getCreditHours).sum();
 
-            // Check credit hour constraints
-            if (i == semesterPlan.size() - 1) {
-                if (totalCredits > shortSemesterCredits) fitness -= 10;
-            } else if (totalCredits > maxCredits) {
-                fitness -= 10;
+            // Penalize exceeding credit limits
+            int maxCredits = isShortSemester(i) ? SHORT_SEMESTER_MAX_CREDITS : LONG_SEMESTER_MAX_CREDITS;
+            if (totalCredits > maxCredits) {
+                fitness -= 100; // Hard penalty for exceeding credit limit
             }
 
-            // Check Capstone Project constraints
-            if (semester.contains(Subject.PRJ3213)) {
-                if (i < 6 || i > 8) {
-                    fitness -= 20; // Capstone Project 1 must be in semester 7, 8, or 9
-                }
-            }
-            if (semester.contains(Subject.PRJ3223)) {
-                if (i < 7 || i > 8) {
-                    fitness -= 20; // Capstone Project 2 must be in semester 8 or 9
-                }
-                boolean capstone1Found = false;
-                for (int j = 0; j < i; j++) {
-                    if (semesterPlan.get(j).contains(Subject.PRJ3213)) {
-                        capstone1Found = true;
-                        break;
-                    }
-                }
-                if (!capstone1Found) fitness -= 30; // Capstone Project 2 must follow Capstone Project 1
-            }
-        }
-
-        // Penalize if a completed subject is added to the plan
-        for (List<Subject> semester : semesterPlan) {
+            // Penalize duplicate subjects
             for (Subject subject : semester) {
-                if (student.hasCompleted(subject.getSubjectCode())) {
-                    fitness -= 5;
+                if (allSubjects.contains(subject)) {
+                    fitness -= 50; // Deduct heavily for duplicates
+                } else {
+                    allSubjects.add(subject);
                 }
             }
         }
 
         chromosome.setFitness(fitness);
         return fitness;
+    }
+
+
+    private boolean isShortSemester(int semesterIndex) {
+        // Semesters 1, 4, and 7 are short semesters (0-based index)
+        return semesterIndex == 0 || semesterIndex == 3 || semesterIndex == 6;
     }
 }

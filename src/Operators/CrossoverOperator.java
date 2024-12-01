@@ -3,26 +3,52 @@ package Operators;
 import Data.Chromosome;
 import Data.Subject;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class CrossoverOperator {
     public Chromosome crossover(Chromosome parent1, Chromosome parent2) {
         List<List<Subject>> childSemesterPlan = new ArrayList<>();
-        List<List<Subject>> parent1Plan = parent1.getSemesterPlan();
-        List<List<Subject>> parent2Plan = parent2.getSemesterPlan();
-        Random random = new Random();
+        Set<Subject> assignedSubjects = new HashSet<>();
 
-        for (int semester = 0; semester < Math.min(parent1Plan.size(), parent2Plan.size()); semester++) {
-            // Randomly pick semester subjects from parent1 or parent2
-            if (random.nextBoolean()) {
-                childSemesterPlan.add(new ArrayList<>(parent1Plan.get(semester)));
-            } else {
-                childSemesterPlan.add(new ArrayList<>(parent2Plan.get(semester)));
+        for (int semesterIndex = 0; semesterIndex < parent1.getSemesterPlan().size(); semesterIndex++) {
+            List<Subject> childSemester = new ArrayList<>();
+            List<Subject> parent1Semester = parent1.getSemesterPlan().get(semesterIndex);
+            List<Subject> parent2Semester = parent2.getSemesterPlan().get(semesterIndex);
+
+            for (Subject subject : parent1Semester) {
+                if (!assignedSubjects.contains(subject)) {
+                    childSemester.add(subject);
+                    assignedSubjects.add(subject);
+                }
             }
+
+            for (Subject subject : parent2Semester) {
+                if (!assignedSubjects.contains(subject)) {
+                    childSemester.add(subject);
+                    assignedSubjects.add(subject);
+                }
+            }
+
+            childSemesterPlan.add(childSemester);
         }
 
         return new Chromosome(childSemesterPlan);
+    }
+
+
+
+    private List<Subject> distributeSubjectsToSemester(List<Subject> subjects, int semesterIndex) {
+        List<Subject> distributedSubjects = new ArrayList<>();
+        int currentCredits = 0;
+        int maxCredits = semesterIndex == 0 || semesterIndex == 3 || semesterIndex == 6 ? 10 : 19;
+
+        for (Subject subject : subjects) {
+            if (currentCredits + subject.getCreditHours() <= maxCredits) {
+                distributedSubjects.add(subject);
+                currentCredits += subject.getCreditHours();
+            }
+        }
+
+        return distributedSubjects;
     }
 }

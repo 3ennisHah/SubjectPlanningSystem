@@ -80,6 +80,8 @@ public class Subject {
     public static final Subject MPU3183 = new Subject("MPU3183", "Penghayatan Etika dan Peradaban", 3, new String[]{}, false);
     public static final Subject MPU3213 = new Subject("MPU3213", "Malay Language for Communication 2", 3, new String[]{}, false);
     public static final Subject KIAR = new Subject("KIAR", "Integrity and Anti-Corruption", 2, new String[]{}, false);
+    public static final Subject MAT1013 = new Subject("MAT1013", "Micro-credential in Computer Mathematics Fundamentals", 3, new String[]{}, true);
+    public static final Subject BIS2212 = new Subject("BIS2212", "Social & Professional Responsibilities", 2, new String[]{}, true);
 
     // ******** Dummy Electives ******** //
     public static Subject FreeElective1 = new Subject("FreeElective1", "Placeholder Free Elective 1", 3, new String[]{}, false);
