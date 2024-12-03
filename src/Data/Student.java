@@ -162,7 +162,20 @@ public class Student {
                 student.addCompletedSubject(Subject.KIAR);
                 break;
 
-            // Add other student cases here
+            case 2: // Bob NoMath (March 2024 Intake, Semester 3)
+                student = new Student("S1002", "Bob NoMath", "2024", "MathMarch", 3);
+
+                // Completed subjects that do not align with Semesters 1 and 2
+                student.addCompletedSubject(Subject.ENG1044);  // English for Computer Technology Studies
+                student.addCompletedSubject(Subject.CSC1202);  // Computer Organisation
+                student.addCompletedSubject(Subject.CSC1024);  // Programming Principles
+                student.addCompletedSubject(Subject.MAT1013);  // Micro-credential in Computer Mathematics Fundamentals
+                student.addCompletedSubject(Subject.CSC2103);  // Data Structure and Algorithms (not from Semester 1 or 2)
+                student.addCompletedSubject(Subject.SEG1201);  // Database Fundamentals
+                student.addCompletedSubject(Subject.PRG1203);  // Object-Oriented Programming Fundamentals
+                student.addCompletedSubject(Subject.CSC2104);  // Operating System Fundamentals
+                student.addCompletedSubject(Subject.MTH1114);  // Computer Mathematics
+                break;
         }
 
         return student;

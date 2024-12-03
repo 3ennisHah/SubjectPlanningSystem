@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.Set;
 
 public class FitnessFunction {
-    private static final int SHORT_SEMESTER_MAX_CREDITS = 10;
-    private static final int LONG_SEMESTER_MAX_CREDITS = 19;
+    public static final int SHORT_SEMESTER_MAX_CREDITS = 10;
+    public static final int LONG_SEMESTER_MAX_CREDITS = 19;
 
     public int calculateFitness(Chromosome chromosome, Student student) {
         List<List<Subject>> semesterPlan = chromosome.getSemesterPlan();
@@ -37,13 +37,10 @@ public class FitnessFunction {
             }
         }
 
-        chromosome.setFitness(fitness);
         return fitness;
     }
 
-
     private boolean isShortSemester(int semesterIndex) {
-        // Semesters 1, 4, and 7 are short semesters (0-based index)
-        return semesterIndex == 0 || semesterIndex == 3 || semesterIndex == 6;
+        return semesterIndex == 0 || semesterIndex == 3 || semesterIndex == 6; // Example: Semesters 1, 4, and 7
     }
 }

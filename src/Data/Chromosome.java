@@ -4,11 +4,9 @@ import java.util.List;
 
 public class Chromosome {
     private List<List<Subject>> semesterPlan;
-    private int fitness;
 
     public Chromosome(List<List<Subject>> semesterPlan) {
         this.semesterPlan = semesterPlan;
-        this.fitness = 0; // Default fitness
     }
 
     public List<List<Subject>> getSemesterPlan() {
@@ -19,19 +17,12 @@ public class Chromosome {
         this.semesterPlan = semesterPlan;
     }
 
-    public int getFitness() {
-        return fitness;
-    }
-
-    public void setFitness(int fitness) {
-        this.fitness = fitness;
-    }
-
     @Override
     public String toString() {
-        return "Chromosome{" +
-                "semesterPlan=" + semesterPlan +
-                ", fitness=" + fitness +
-                '}';
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < semesterPlan.size(); i++) {
+            sb.append("Semester ").append(i + 1).append(": ").append(semesterPlan.get(i)).append("\n");
+        }
+        return sb.toString();
     }
 }

@@ -6,26 +6,30 @@ import Data.Population;
 import java.util.Random;
 
 public class SelectionOperator {
-    public Chromosome select(Population population) {
-        int totalFitness = population.getTotalFitness();
-        if (totalFitness == 0) {
-            // If all chromosomes have fitness 0, select randomly
-            Random random = new Random();
-            return population.getChromosomes().get(random.nextInt(population.getChromosomes().size()));
-        }
 
-        Random random = new Random();
-        int selectionPoint = random.nextInt(totalFitness);
-        int cumulativeFitness = 0;
+    public Chromosome selectParent(Population population) {
+        double totalFitness = population.getTotalFitness();
+        double randomFitness = new Random().nextDouble() * totalFitness;
 
+        double cumulativeFitness = 0.0;
         for (Chromosome chromosome : population.getChromosomes()) {
             cumulativeFitness += chromosome.getFitness();
-            if (cumulativeFitness >= selectionPoint) {
+            if (cumulativeFitness >= randomFitness) {
                 return chromosome;
             }
         }
+        return population.getChromosomes().get(0); // Fallback in case of rounding errors
+    }
 
-        // Fallback in case no selection matches
-        return population.getChromosomes().get(0);
+    public Chromosome tournamentSelection(Population population, int tournamentSize) {
+        Random random = new Random();
+        Population tournament = new Population();
+
+        for (int i = 0; i < tournamentSize; i++) {
+            Chromosome randomChromosome = population.getChromosomes()
+                    .get(random.nextInt(population.getChromosomes().size()));
+            tournament.addChromosome(randomChromosome);
+        }
+        return tournament.getFittest();
     }
 }

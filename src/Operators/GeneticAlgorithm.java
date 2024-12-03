@@ -5,115 +5,108 @@ import Data.Population;
 import Data.Student;
 import Data.Subject;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 public class GeneticAlgorithm {
+    private static final int MAX_CREDITS = 19;
+    private static final double MUTATION_RATE = 0.1;
+    private static final int MAX_GENERATIONS = 200;
     private final FitnessFunction fitnessFunction = new FitnessFunction();
-    private final CrossoverOperator crossoverOperator = new CrossoverOperator();
-    private final MutationOperator mutationOperator = new MutationOperator();
 
     public Chromosome evolve(List<List<Subject>> basePlan, Student student, List<Subject> allSubjects) {
-        // Initialize population here
-        int populationSize = 50;
-        Population population = initializePopulation(basePlan, populationSize, student);
+        Population population = initializePopulation(basePlan, student, allSubjects);
+        Chromosome bestChromosome = null;
 
-        int generations = 100;
+        for (int generation = 0; generation < MAX_GENERATIONS; generation++) {
+            Population nextPopulation = new Population();
 
-        for (int generation = 0; generation < generations; generation++) {
-            Population newPopulation = new Population(new ArrayList<>());
-
-            for (Chromosome parent1 : population.getChromosomes()) {
-                Chromosome parent2 = select(population);
-
-                Chromosome child = crossoverOperator.crossover(parent1, parent2);
-                mutationOperator.mutate(child, allSubjects);
-                fitnessFunction.calculateFitness(child, student);
-
-                newPopulation.addChromosome(child);
+            for (Chromosome chromosome : population.getChromosomes()) {
+                Chromosome offspring = optimizeSubjectPlan(chromosome, basePlan, student);
+                int fitness = fitnessFunction.calculateFitness(offspring, student);
+                offspring.setFitness(fitness);
+                nextPopulation.addChromosome(offspring);
             }
 
-            population = newPopulation;
+            Chromosome fittestChromosome = nextPopulation.getFittest();
 
-            Chromosome best = population.getFittest();
-            if (best != null && best.getFitness() == 100) {
-                return best; // Early stopping if perfect solution is found
+            // Update the best chromosome if the new one is better
+            if (bestChromosome == null || fittestChromosome.getFitness() > bestChromosome.getFitness()) {
+                bestChromosome = fittestChromosome;
             }
+
+            // Display generation and fitness score
+            System.out.println("Generation " + (generation + 1) + " - Fitness score: " + fittestChromosome.getFitness());
+
+            population = nextPopulation;
         }
 
-        return population.getFittest(); // Return the best solution
+        // Return the best chromosome found across all generations
+        return bestChromosome;
     }
 
-    private Population initializePopulation(List<List<Subject>> basePlan, int populationSize, Student student) {
-        List<Chromosome> chromosomes = new ArrayList<>();
-        Random random = new Random();
+    private Population initializePopulation(List<List<Subject>> basePlan, Student student, List<Subject> allSubjects) {
+        Population population = new Population();
 
-        for (int i = 0; i < populationSize; i++) {
-            List<List<Subject>> randomPlan = new ArrayList<>();
-            Set<Subject> usedSubjects = new HashSet<>();
-
-            for (List<Subject> semester : basePlan) {
-                List<Subject> randomizedSemester = new ArrayList<>();
-
-                for (Subject subject : semester) {
-                    if (!usedSubjects.contains(subject)) {
-                        randomizedSemester.add(subject);
-                        usedSubjects.add(subject);
-                    }
-                }
-
-                // Shuffle within the semester for variety
-                Collections.shuffle(randomizedSemester, random);
-                randomPlan.add(randomizedSemester);
-            }
-
-            Chromosome chromosome = new Chromosome(randomPlan);
-            fitnessFunction.calculateFitness(chromosome, student);
-            chromosomes.add(chromosome);
+        for (int i = 0; i < 10; i++) {
+            Chromosome chromosome = generateRandomChromosome(basePlan, student, allSubjects);
+            int fitness = fitnessFunction.calculateFitness(chromosome, student);
+            chromosome.setFitness(fitness);
+            population.addChromosome(chromosome);
         }
 
-        return new Population(chromosomes);
+        return population;
     }
 
+    private Chromosome generateRandomChromosome(List<List<Subject>> basePlan, Student student, List<Subject> allSubjects) {
+        List<List<Subject>> semesterPlan = new ArrayList<>();
 
-    private Chromosome select(Population population) {
-        Random random = new Random();
-        int totalFitness = population.getTotalFitness();
-        int selectionPoint = random.nextInt(totalFitness);
-        int cumulativeFitness = 0;
-
-        for (Chromosome chromosome : population.getChromosomes()) {
-            cumulativeFitness += chromosome.getFitness();
-            if (cumulativeFitness >= selectionPoint) {
-                return chromosome;
-            }
+        // Ensure semesterPlan is mutable
+        for (List<Subject> semester : basePlan) {
+            semesterPlan.add(new ArrayList<>(semester)); // Create mutable copy
         }
 
-        return population.getChromosomes().get(0); // Fallback
+        List<Subject> missedSubjects = findMissedSubjects(student, basePlan);
+        if (missedSubjects != null && !missedSubjects.isEmpty()) {
+            distributeMissedSubjects(missedSubjects, semesterPlan);
+        }
+
+        return new Chromosome(semesterPlan);
     }
 
-    private List<List<Subject>> distributeSubjects(List<List<Subject>> randomPlan) {
-        List<List<Subject>> distributedPlan = new ArrayList<>();
-        for (int i = 0; i < randomPlan.size(); i++) {
-            distributedPlan.add(new ArrayList<>());
-        }
+    private List<Subject> findMissedSubjects(Student student, List<List<Subject>> basePlan) {
+        List<Subject> missedSubjects = new ArrayList<>();
+        Set<String> completedSubjectCodes = student.getCompletedSubjectCodes();
 
-        for (int semesterIndex = 0; semesterIndex < randomPlan.size(); semesterIndex++) {
-            List<Subject> semesterSubjects = randomPlan.get(semesterIndex);
-            int currentCredits = 0;
-
-            for (Subject subject : semesterSubjects) {
-                int maxCredits = isShortSemester(semesterIndex) ? 10 : 19;
-                if (currentCredits + subject.getCreditHours() <= maxCredits) {
-                    distributedPlan.get(semesterIndex).add(subject);
-                    currentCredits += subject.getCreditHours();
+        for (List<Subject> semester : basePlan) {
+            for (Subject subject : semester) {
+                if (!completedSubjectCodes.contains(subject.getSubjectCode())) {
+                    missedSubjects.add(subject);
                 }
             }
         }
 
-        return distributedPlan;
+        return missedSubjects;
     }
 
-    private boolean isShortSemester(int semesterIndex) {
-        return semesterIndex == 0 || semesterIndex == 3 || semesterIndex == 6;
+    private void distributeMissedSubjects(List<Subject> missedSubjects, List<List<Subject>> semesterPlan) {
+        for (Subject missedSubject : missedSubjects) {
+            for (List<Subject> semester : semesterPlan) {
+                int semesterCredits = semester.stream().mapToInt(Subject::getCreditHours).sum();
+                if (semesterCredits + missedSubject.getCreditHours() <= MAX_CREDITS) {
+                    semester.add(missedSubject);
+                    break;
+                }
+            }
+        }
+    }
+
+    private Chromosome optimizeSubjectPlan(Chromosome chromosome, List<List<Subject>> basePlan, Student student) {
+        Collections.shuffle(chromosome.getSemesterPlan());
+        List<Subject> missedSubjects = findMissedSubjects(student, basePlan);
+        distributeMissedSubjects(missedSubjects, chromosome.getSemesterPlan());
+        return chromosome;
     }
 }

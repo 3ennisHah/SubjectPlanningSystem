@@ -20,7 +20,12 @@ public class MutationOperator {
                 .collect(Collectors.toSet()); // Track all assigned subjects
 
         for (List<Subject> semester : semesterPlan) {
-            if (!semester.isEmpty() && random.nextDouble() < MUTATION_RATE) { // Check mutation probability
+            if (!semester.isEmpty() && random.nextDouble() < MUTATION_RATE) {
+                if (allSubjects.isEmpty()) {
+                    System.out.println("Error: Subject pool is empty during mutation. Skipping mutation.");
+                    continue; // Avoid mutation if no subjects are available
+                }
+
                 int subjectIndex = random.nextInt(semester.size());
                 Subject newSubject;
 
@@ -33,6 +38,7 @@ public class MutationOperator {
                 semester.set(subjectIndex, newSubject);
             }
         }
+
     }
 
     private List<Subject> distributeSubjectsToSemester(List<Subject> subjects, int semesterIndex) {
