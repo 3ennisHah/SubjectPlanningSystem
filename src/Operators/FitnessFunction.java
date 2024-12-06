@@ -3,44 +3,79 @@ package Operators;
 import Data.Chromosome;
 import Data.Student;
 import Data.Subject;
-
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class FitnessFunction {
-    public static final int SHORT_SEMESTER_MAX_CREDITS = 10;
-    public static final int LONG_SEMESTER_MAX_CREDITS = 19;
+    private static final int MAX_FITNESS = 100;
 
-    public int calculateFitness(Chromosome chromosome, Student student) {
-        List<List<Subject>> semesterPlan = chromosome.getSemesterPlan();
-        int fitness = 100; // Start with a base score
-        Set<Subject> allSubjects = new HashSet<>();
+    public int calculateFitness(Chromosome chromosome, Student student, List<List<Subject>> basePlan) {
+        int fitness = 0;
 
-        for (int i = 0; i < semesterPlan.size(); i++) {
-            List<Subject> semester = semesterPlan.get(i);
-            int totalCredits = semester.stream().mapToInt(Subject::getCreditHours).sum();
+        // Check if all required subjects are present
+        Set<String> baseSubjectCodes = flattenPlan(basePlan);
+        Set<String> chromosomeSubjectCodes = flattenPlan(chromosome.getSemesterPlan());
 
-            // Penalize exceeding credit limits
-            int maxCredits = isShortSemester(i) ? SHORT_SEMESTER_MAX_CREDITS : LONG_SEMESTER_MAX_CREDITS;
-            if (totalCredits > maxCredits) {
-                fitness -= 100; // Hard penalty for exceeding credit limit
-            }
-
-            // Penalize duplicate subjects
-            for (Subject subject : semester) {
-                if (allSubjects.contains(subject)) {
-                    fitness -= 50; // Deduct heavily for duplicates
-                } else {
-                    allSubjects.add(subject);
-                }
+        int missingSubjects = 0;
+        for (String subjectCode : baseSubjectCodes) {
+            if (!chromosomeSubjectCodes.contains(subjectCode)) {
+                missingSubjects++;
             }
         }
+
+        // Penalize missing subjects
+        fitness -= missingSubjects * 10;
+
+        // Reward plans with all required subjects
+        if (missingSubjects == 0) {
+            fitness += 50;
+        }
+
+        // Penalize semesters with more than the max credits (e.g., 19)
+        for (List<Subject> semester : chromosome.getSemesterPlan()) {
+            int totalCredits = semester.stream().mapToInt(Subject::getCreditHours).sum();
+            if (totalCredits > 19) {
+                fitness -= 5 * (totalCredits - 19); // Penalize for exceeding credit limits
+            }
+        }
+
+        // Reward semesters that match the base plan
+        List<List<Subject>> chromosomeSemesters = chromosome.getSemesterPlan();
+        for (int i = 0; i < Math.min(basePlan.size(), chromosomeSemesters.size()); i++) {
+            List<Subject> baseSemester = basePlan.get(i);
+            List<Subject> chromosomeSemester = chromosomeSemesters.get(i);
+
+            // Check if the semester subjects match exactly
+            if (subjectsMatch(baseSemester, chromosomeSemester)) {
+                fitness += 5; // Reward for matching the base plan
+            }
+        }
+
+        // Ensure fitness is within the range [0, MAX_FITNESS]
+        fitness = Math.max(0, Math.min(MAX_FITNESS, fitness));
 
         return fitness;
     }
 
-    private boolean isShortSemester(int semesterIndex) {
-        return semesterIndex == 0 || semesterIndex == 3 || semesterIndex == 6; // Example: Semesters 1, 4, and 7
+    // Helper method to check if two semesters have the same subjects
+    private boolean subjectsMatch(List<Subject> semester1, List<Subject> semester2) {
+        Set<String> semester1SubjectCodes = semester1.stream()
+                .map(Subject::getSubjectCode)
+                .collect(Collectors.toSet());
+
+        Set<String> semester2SubjectCodes = semester2.stream()
+                .map(Subject::getSubjectCode)
+                .collect(Collectors.toSet());
+
+        return semester1SubjectCodes.equals(semester2SubjectCodes);
+    }
+
+    // Helper method to flatten a plan (list of lists) into a set of subject codes
+    private Set<String> flattenPlan(List<List<Subject>> plan) {
+        return plan.stream()
+                .flatMap(List::stream)
+                .map(Subject::getSubjectCode)
+                .collect(Collectors.toSet());
     }
 }

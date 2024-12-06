@@ -1,9 +1,6 @@
 package Data;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Student {
@@ -15,7 +12,8 @@ public class Student {
     private boolean mathRequirement;
     private String enrollmentYear;
     private String enrollmentIntake;
-    private int currentSemester; // New Field: Current Semester
+    private int currentSemester;
+    private List<List<Subject>> basePlan;
 
     public Student(String studentId, String name, String enrollmentYear, String enrollmentIntake, int currentSemester) {
         this.studentId = studentId;
@@ -26,9 +24,9 @@ public class Student {
         this.mathRequirement = false;
         this.enrollmentYear = enrollmentYear;
         this.enrollmentIntake = enrollmentIntake;
-        this.currentSemester = currentSemester; // Initialize current semester
+        this.currentSemester = currentSemester;
+        this.basePlan = new ArrayList<>(); // Initialize basePlan as an empty list
     }
-
 
     public String getStudentId() {
         return studentId;
@@ -38,22 +36,31 @@ public class Student {
         return name;
     }
 
-    public List<Subject> getCompletedSubjects() {
-        return completedSubjects;
+    public Set<Subject> getCompletedSubjects() {
+        // Convert the internal list to a set to ensure no duplicates
+        return new HashSet<>(completedSubjects);
     }
 
     public void addCompletedSubject(Subject subject) {
-        completedSubjects.add(subject);
-        if (subject.getSubjectCode().equals("MTH1114")) {
-            this.mathRequirement = true; // Math requirement fulfilled
+        if (!completedSubjects.contains(subject)) {
+            completedSubjects.add(subject);
+            if (subject.getSubjectCode().equals("MTH1114")) {
+                this.mathRequirement = true; // Math requirement fulfilled
+            }
         }
+    }
+
+    public String getProgrammeCode() {
+        return "BCS";
+    }
+
+    public String constructCohortKey() {
+        return getProgrammeCode() + getEnrollmentYear() + getEnrollmentIntake();
     }
 
     public List<Subject> getFailedSubjects() {
         return failedSubjects;
     }
-
-
 
     public boolean hasMathRequirement() {
         return mathRequirement;
@@ -71,29 +78,8 @@ public class Student {
         return currentSemester;
     }
 
-    public int determineCurrentSemester(Map<String, List<Subject>> baseLineup) {
-        Set<String> completedSubjectCodes = this.getCompletedSubjectCodes();
-        int semesterIndex = 0;
-
-        for (Map.Entry<String, List<Subject>> entry : baseLineup.entrySet()) {
-            List<Subject> semesterSubjects = entry.getValue();
-            boolean allSubjectsCompleted = semesterSubjects.stream()
-                    .allMatch(subject -> completedSubjectCodes.contains(subject.getSubjectCode()));
-
-            // If all subjects in a semester are completed, move to the next semester
-            if (allSubjectsCompleted) {
-                semesterIndex++;
-            } else {
-                // If not all subjects are completed, the current semester is found
-                break;
-            }
-        }
-
-        return semesterIndex + 1; // Return the current semester as a 1-based index
-    }
-
-    public void setCurrentSemester(int currentSemester) {
-        this.currentSemester = currentSemester;
+    public List<List<Subject>> getBasePlan() {
+        return basePlan;
     }
 
     public boolean isOnTrack(Map<String, List<Subject>> baseLineup) {
@@ -121,6 +107,29 @@ public class Student {
         return completedSubjects.stream()
                 .map(Subject::getSubjectCode)
                 .collect(Collectors.toSet());
+    }
+
+    /**
+     * Returns a list of all subjects relevant to the student, including:
+     * - Subjects from the base plan
+     * - Completed subjects
+     * - Failed subjects
+     *
+     * @return List of all subjects.
+     */
+    public List<Subject> getAllSubjects() {
+        Set<Subject> allSubjects = new HashSet<>();
+
+        // Add all subjects from the base plan
+        for (List<Subject> semester : basePlan) {
+            allSubjects.addAll(semester);
+        }
+
+        // Add completed and failed subjects
+        allSubjects.addAll(completedSubjects);
+        allSubjects.addAll(failedSubjects);
+
+        return new ArrayList<>(allSubjects); // Return as a list
     }
 
     @Override

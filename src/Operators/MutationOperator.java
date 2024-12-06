@@ -2,57 +2,40 @@ package Operators;
 
 import Data.Chromosome;
 import Data.Subject;
+import SubjectPlan.SubjectPlanUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class MutationOperator {
-    private static final double MUTATION_RATE = 0.1; // Define mutation rate as 10%
 
-    public void mutate(Chromosome chromosome, List<Subject> allSubjects) {
-        Random random = new Random();
-        List<List<Subject>> semesterPlan = chromosome.getSemesterPlan();
-        Set<Subject> assignedSubjects = semesterPlan.stream()
-                .flatMap(List::stream)
-                .collect(Collectors.toSet()); // Track all assigned subjects
+    private final Random random = new Random();
 
-        for (List<Subject> semester : semesterPlan) {
-            if (!semester.isEmpty() && random.nextDouble() < MUTATION_RATE) {
-                if (allSubjects.isEmpty()) {
-                    System.out.println("Error: Subject pool is empty during mutation. Skipping mutation.");
-                    continue; // Avoid mutation if no subjects are available
-                }
+    public Chromosome mutateChromosome(Chromosome chromosome, List<Subject> allSubjects) {
+        // Example mutation logic
+        int semesterIndex = random.nextInt(chromosome.getSemesterPlan().size());
+        List<Subject> semester = chromosome.getSemesterPlan().get(semesterIndex);
 
-                int subjectIndex = random.nextInt(semester.size());
-                Subject newSubject;
+        if (!semester.isEmpty()) {
+            int subjectIndex = random.nextInt(semester.size());
+            Subject subject = semester.get(subjectIndex);
 
-                do {
-                    newSubject = allSubjects.get(random.nextInt(allSubjects.size()));
-                } while (assignedSubjects.contains(newSubject)); // Ensure no duplicates
+            // Debug before mutation
+            System.out.println("[DEBUG] Mutating subject: " + subject + " in semester " + (semesterIndex + 1));
 
-                assignedSubjects.remove(semester.get(subjectIndex));
-                assignedSubjects.add(newSubject);
+            // Replace with a random subject
+            Subject newSubject = allSubjects.get(random.nextInt(allSubjects.size()));
+            Set<String> existingSubjects = SubjectPlanUtils.flattenPlan(chromosome.getSemesterPlan());
+
+            if (!existingSubjects.contains(newSubject.getSubjectCode())) {
                 semester.set(subjectIndex, newSubject);
             }
+
+            // Debug after mutation
+            System.out.println("[DEBUG] Semester after mutation: " + semester);
         }
 
-    }
-
-    private List<Subject> distributeSubjectsToSemester(List<Subject> subjects, int semesterIndex) {
-        List<Subject> distributedSubjects = new ArrayList<>();
-        int currentCredits = 0;
-        int maxCredits = semesterIndex == 0 || semesterIndex == 3 || semesterIndex == 6 ? 10 : 19;
-
-        for (Subject subject : subjects) {
-            if (currentCredits + subject.getCreditHours() <= maxCredits) {
-                distributedSubjects.add(subject);
-                currentCredits += subject.getCreditHours();
-            }
-        }
-
-        return distributedSubjects;
+        return chromosome;
     }
 }

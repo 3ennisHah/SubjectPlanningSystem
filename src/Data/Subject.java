@@ -1,17 +1,18 @@
 package Data;
 
+import java.util.List;
+
 public class Subject {
     private String subjectCode;
     private String subjectName;
     private int creditHours;
     private String[] prerequisites; // Prerequisite subject codes
     private boolean isCore; // Indicates if the subject is core or elective
-    private String name;
 
     // Constructor
-    public Subject(String subjectCode, String name, int creditHours, String[] prerequisites, boolean isCore) {
+    public Subject(String subjectCode, String subjectName, int creditHours, String[] prerequisites, boolean isCore) {
         this.subjectCode = subjectCode;
-        this.name = name;
+        this.subjectName = subjectName;
         this.creditHours = creditHours;
         this.prerequisites = prerequisites;
         this.isCore = isCore;
@@ -20,10 +21,6 @@ public class Subject {
     // Getters
     public String getSubjectCode() {
         return subjectCode;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getSubjectName() {
@@ -42,6 +39,22 @@ public class Subject {
         return isCore;
     }
 
+    // Helper method to retrieve the first prerequisite as a Subject
+    public Subject getPrerequisite(List<Subject> allSubjects) {
+        if (prerequisites.length == 0) {
+            return null; // No prerequisites
+        }
+
+        String prerequisiteCode = prerequisites[0]; // Assume only one prerequisite for simplicity
+        for (Subject subject : allSubjects) {
+            if (subject.getSubjectCode().equals(prerequisiteCode)) {
+                return subject; // Return the prerequisite subject
+            }
+        }
+
+        return null; // Prerequisite not found
+    }
+
     // Check if this subject has a prerequisite
     public boolean hasPrerequisite() {
         return prerequisites.length > 0;
@@ -49,7 +62,7 @@ public class Subject {
 
     @Override
     public String toString() {
-        return name + " (" + subjectCode + ")";
+        return subjectName + " (" + subjectCode + ")";
     }
 
     // ******** Core Subjects ******** //

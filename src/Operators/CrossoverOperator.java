@@ -3,52 +3,27 @@ package Operators;
 import Data.Chromosome;
 import Data.Subject;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class CrossoverOperator {
+
     public Chromosome crossover(Chromosome parent1, Chromosome parent2) {
-        List<List<Subject>> childSemesterPlan = new ArrayList<>();
-        Set<Subject> assignedSubjects = new HashSet<>();
+        Chromosome offspring = new Chromosome();
 
-        for (int semesterIndex = 0; semesterIndex < parent1.getSemesterPlan().size(); semesterIndex++) {
-            List<Subject> childSemester = new ArrayList<>();
-            List<Subject> parent1Semester = parent1.getSemesterPlan().get(semesterIndex);
-            List<Subject> parent2Semester = parent2.getSemesterPlan().get(semesterIndex);
-
-            for (Subject subject : parent1Semester) {
-                if (!assignedSubjects.contains(subject)) {
-                    childSemester.add(subject);
-                    assignedSubjects.add(subject);
-                }
+        for (int i = 0; i < parent1.getSemesterPlan().size(); i++) {
+            List<Subject> semester = new ArrayList<>();
+            if (i % 2 == 0) {
+                semester.addAll(parent1.getSemesterPlan().get(i));
+            } else {
+                semester.addAll(parent2.getSemesterPlan().get(i));
             }
-
-            for (Subject subject : parent2Semester) {
-                if (!assignedSubjects.contains(subject)) {
-                    childSemester.add(subject);
-                    assignedSubjects.add(subject);
-                }
-            }
-
-            childSemesterPlan.add(childSemester);
+            offspring.getSemesterPlan().add(semester);
         }
 
-        return new Chromosome(childSemesterPlan);
+        return offspring;
     }
 
 
-
-    private List<Subject> distributeSubjectsToSemester(List<Subject> subjects, int semesterIndex) {
-        List<Subject> distributedSubjects = new ArrayList<>();
-        int currentCredits = 0;
-        int maxCredits = semesterIndex == 0 || semesterIndex == 3 || semesterIndex == 6 ? 10 : 19;
-
-        for (Subject subject : subjects) {
-            if (currentCredits + subject.getCreditHours() <= maxCredits) {
-                distributedSubjects.add(subject);
-                currentCredits += subject.getCreditHours();
-            }
-        }
-
-        return distributedSubjects;
-    }
 }

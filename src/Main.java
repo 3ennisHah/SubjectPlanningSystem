@@ -1,7 +1,5 @@
-package Main;
-
-import Data.Student;
-import Data.Subject;
+import Data.*;
+import SubjectPlan.SubjectPlanUtils;
 import SubjectPlan.SubjectPlanner;
 
 import java.util.List;
@@ -19,51 +17,40 @@ public class Main {
         System.out.print("Enter your choice (1/2/3): ");
 
         int choice = scanner.nextInt();
-
-        // Dynamically determine cohortKey based on the student choice
-        String cohortKey = switch (choice) {
-            case 1 -> "BCS2024January";
-            case 2 -> "BCS2024MathMarch";
-            case 3 -> "BCS2024August";
-            default -> null;
-        };
-
-        if (cohortKey == null) {
-            System.out.println("Invalid choice. Exiting.");
-            return;
-        }
-
-        // Initialize base lineup
-        Map<String, List<Subject>> baseLineup = SubjectPlanner.initializeBaseLineup(cohortKey);
-
-        if (baseLineup == null || baseLineup.isEmpty()) {
-            System.out.println("No lineup found for cohort: " + cohortKey);
-            return;
-        }
-
-        // Retrieve the selected student based on choice
-        Student selectedStudent = Student.getStudentByChoice(choice, baseLineup);
+        Student selectedStudent = Student.getStudentByChoice(choice, null);
 
         if (selectedStudent == null) {
-            System.out.println("No student found for choice: " + choice);
+            System.out.println("Invalid choice.");
             return;
         }
 
-        try {
-            // Plan subjects using SubjectPlanner
-            SubjectPlanner subjectPlanner = new SubjectPlanner();
-            System.out.println("Planning subjects for: " + selectedStudent.getName());
+        SubjectPlanner planner = new SubjectPlanner();
+        String cohortKey = selectedStudent.constructCohortKey();
+        System.out.println("Debug: Constructed cohort key is " + cohortKey);
 
-            List<List<Subject>> subjectPlan = subjectPlanner.planSubjects(selectedStudent);
+        Map<String, List<Subject>> baseLineupMap = planner.initializeBaseLineup(cohortKey);
+        if (baseLineupMap == null || baseLineupMap.isEmpty()) {
+            System.out.println("Error: Unable to retrieve a valid base lineup for the student.");
+            return;
+        }
 
-            // Print the complete subject plan
-            System.out.println("Complete Subject Plan for " + selectedStudent.getName() + ":");
-            for (int i = 0; i < subjectPlan.size(); i++) {
-                System.out.println("Semester " + (i + 1) + ": " + subjectPlan.get(i));
-            }
-        } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
-            e.printStackTrace();
+        List<List<Subject>> basePlan = planner.convertToPlanList(baseLineupMap);
+
+        System.out.println("Base Plan for " + selectedStudent.getName() + ":");
+        SubjectPlanUtils.printPlan(basePlan);
+
+        if (!selectedStudent.isOnTrack(baseLineupMap)) {
+            System.out.println(selectedStudent.getName() + " is not on track. Invoking Genetic Algorithm...");
+
+            Chromosome bestChromosome = planner.runGeneticAlgorithm(selectedStudent, basePlan);
+
+            System.out.println("\nOptimized Subject Plan for " + selectedStudent.getName() + ":");
+            SubjectPlanUtils.printPlan(bestChromosome.getSemesterPlan());
+
+            System.out.println("\nComparison with Base Plan:");
+            SubjectPlanUtils.comparePlans(basePlan, bestChromosome.getSemesterPlan());
+        } else {
+            System.out.println(selectedStudent.getName() + " is on track.");
         }
     }
 }
