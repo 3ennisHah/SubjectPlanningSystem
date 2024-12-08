@@ -11,9 +11,14 @@ public class SubjectPlanner {
     private final GeneticAlgorithm geneticAlgorithm = new GeneticAlgorithm();
 
     public Map<String, List<Subject>> initializeBaseLineup(String cohortKey, boolean isInternational) {
-        // Pass both the cohort key and the international status
-        return LineupManager.getLineupForCohort(cohortKey, isInternational);
+        System.out.println("[DEBUG] Initializing base lineup for cohort key: " + cohortKey + ", International: " + isInternational);
+        Map<String, List<Subject>> lineup = LineupManager.getLineupForCohort(cohortKey, isInternational);
+        if (lineup == null) {
+            System.out.println("[ERROR] No lineup found for cohort key: " + cohortKey);
+        }
+        return lineup;
     }
+
 
     public List<List<Subject>> convertToPlanList(Map<String, List<Subject>> lineupMap) {
         List<List<Subject>> planList = new ArrayList<>();
@@ -42,15 +47,19 @@ public class SubjectPlanner {
                 for (Subject subject : basePlan.get(i)) {
                     if (student.getCompletedSubjectCodes().contains(subject.getSubjectCode())) {
                         completedSubjects.add(subject);
+                    } else {
+                        System.out.println("[DEBUG] Removing incomplete subject " + subject.getSubjectCode() + " from Semester " + (i + 1));
                     }
                 }
                 adjustedPlan.add(completedSubjects);
+                System.out.println("[DEBUG] Fixed Semester " + (i + 1) + ": " + completedSubjects);
             } else {
                 // Include the remaining semesters as-is
                 adjustedPlan.add(new ArrayList<>(basePlan.get(i)));
+                System.out.println("[DEBUG] Keeping Semester " + (i + 1) + " as-is: " + basePlan.get(i));
             }
         }
-
         return adjustedPlan;
     }
+
 }

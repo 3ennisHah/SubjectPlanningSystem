@@ -25,10 +25,12 @@ public class Student {
         this.mathRequirement = false;
         this.international = false; // Default to false
         this.enrollmentYear = enrollmentYear;
-        this.enrollmentIntake = enrollmentIntake;
+        this.enrollmentIntake = sanitizeIntakeMonth(enrollmentIntake);
         this.currentSemester = currentSemester;
         this.basePlan = new ArrayList<>(); // Initialize basePlan as an empty list
     }
+
+    // Getters and Setters
 
     public String getStudentId() {
         return studentId;
@@ -42,12 +44,20 @@ public class Student {
         return international;
     }
 
+    private String sanitizeIntakeMonth(String intakeMonth) {
+        switch (intakeMonth) {
+            case "MathMarch":
+                return "March"; // Map custom intake value to recognized value
+            default:
+                return intakeMonth; // Return the original value if already valid
+        }
+    }
+
     public void setInternational(boolean international) {
         this.international = international;
     }
 
     public Set<Subject> getCompletedSubjects() {
-        // Convert the internal list to a set to ensure no duplicates
         return new HashSet<>(completedSubjects);
     }
 
@@ -65,7 +75,10 @@ public class Student {
     }
 
     public String constructCohortKey() {
-        return getProgrammeCode() + getEnrollmentYear() + getEnrollmentIntake();
+        String sanitizedIntake = getEnrollmentIntake().equals("March") ? "MathMarch" : getEnrollmentIntake();
+        String cohortKey = getProgrammeCode() + getEnrollmentYear() + sanitizedIntake;
+        System.out.println("[DEBUG] Constructed cohort key: " + cohortKey);
+        return cohortKey;
     }
 
     public List<Subject> getFailedSubjects() {
@@ -102,15 +115,16 @@ public class Student {
             List<Subject> semesterSubjects = baseLineup.get(semesterKey);
 
             for (Subject subject : semesterSubjects) {
-                if (!completedSubjectCodes.contains(subject.getSubjectCode())) {
+                // Ignore electives when determining if the student is on track
+                if (!subject.isElective() && !completedSubjectCodes.contains(subject.getSubjectCode())) {
                     System.out.println("Missing Subject from Prior Semesters: " + subject.getSubjectCode());
-                    return false; // Not on track if a required subject from prior semesters is missing
+                    return false; // Not on track if a required core subject from prior semesters is missing
                 }
             }
         }
 
         System.out.println("Current semester is Semester " + currentSemester + ". Skipping strict validation.");
-        return true; // On track if all prior semesters are completed
+        return true; // On track if all prior core subjects are completed
     }
 
     public Set<String> getCompletedSubjectCodes() {
@@ -119,14 +133,20 @@ public class Student {
                 .collect(Collectors.toSet());
     }
 
-    /**
-     * Returns a list of all subjects relevant to the student, including:
-     * - Subjects from the base plan
-     * - Completed subjects
-     * - Failed subjects
-     *
-     * @return List of all subjects.
-     */
+    // Returns the original semester of a given subject
+    public int findOriginalSemesterForSubject(Subject subject) {
+        for (int semesterIndex = 0; semesterIndex < basePlan.size(); semesterIndex++) {
+            if (basePlan.get(semesterIndex).contains(subject)) {
+                return semesterIndex + 1; // Semester index is zero-based
+            }
+        }
+        return -1; // Subject not found
+    }
+
+    public String getIntakeMonth() {
+        return enrollmentIntake; // Assumes enrollmentIntake stores the month of intake
+    }
+
     public List<Subject> getAllSubjects() {
         Set<Subject> allSubjects = new HashSet<>();
 
@@ -220,9 +240,46 @@ public class Student {
                 // Failed subjects
                 student.getFailedSubjects().add(Subject.WEB1201);  // Failed Web Fundamentals
                 break;
+
+            case 4: // Mark (International Student, August 2024 Intake, Semester 7)
+                student = new Student("S1004", "Mark International", "2024", "August", 7); // Current semester is 7
+                student.setInternational(true); // Mark is an international student
+
+                // Completed subjects up to semester 6
+                student.addCompletedSubject(Subject.MPU3203); // Appreciation of Ethics and Civilisation
+                student.addCompletedSubject(Subject.MPU3213); // Malay Language for Communication 2
+                student.addCompletedSubject(Subject.CSC1024); // Programming Principles
+                student.addCompletedSubject(Subject.ENG1044); // English for Computer Technology Studies
+                student.addCompletedSubject(Subject.CSC1202); // Computer Organisation
+                student.addCompletedSubject(Subject.MTH1114); // Computer Mathematics
+                student.addCompletedSubject(Subject.PRG1203); // Object-Oriented Programming Fundamentals
+                student.addCompletedSubject(Subject.SEG1201); // Database Fundamentals
+                student.addCompletedSubject(Subject.NET1014); // Networking Principles
+                student.addCompletedSubject(Subject.CSC2104); // Operating System Fundamentals
+                student.addCompletedSubject(Subject.WEB1201); // Web Fundamentals
+                student.addCompletedSubject(Subject.CSC2103); // Data Structure & Algorithms
+                student.addCompletedSubject(Subject.PRG2104); // Object-Oriented Programming
+                student.addCompletedSubject(Subject.CSC2014); // Digital Image Processing
+                student.addCompletedSubject(Subject.ENG2044); // Communication Skills
+                student.addCompletedSubject(Subject.MPU3222); // Entrepreneurial Mindset and Skills
+                student.addCompletedSubject(Subject.SEG2202); // Software Engineering
+                student.addCompletedSubject(Subject.KIAR); // Integrity and Anti-Corruption]
+                student.addCompletedSubject(Subject.FreeElective1);
+                student.addCompletedSubject(Subject.FreeElective2);
+                student.addCompletedSubject(Subject.FreeElective3);
+                student.addCompletedSubject(Subject.Elective1);
+
+                // Failed subjects
+                student.getFailedSubjects().add(Subject.CSC3206); // Failed Artificial Intelligence
+                break;
+
+            default:
+                System.out.println("Invalid choice.");
+                break;
         }
 
         return student;
     }
+
 
 }

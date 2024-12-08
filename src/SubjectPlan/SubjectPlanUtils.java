@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 
 public class SubjectPlanUtils {
+
     public static void printPlan(List<List<Subject>> plan) {
         for (int i = 0; i < plan.size(); i++) {
             System.out.println("Semester " + (i + 1) + ": " + plan.get(i));
@@ -15,9 +16,11 @@ public class SubjectPlanUtils {
     }
 
     public static void comparePlans(List<List<Subject>> basePlan, List<List<Subject>> finalPlan) {
-        for (int i = 0; i < Math.min(basePlan.size(), finalPlan.size()); i++) {
-            List<Subject> baseSemester = basePlan.get(i);
-            List<Subject> finalSemester = finalPlan.get(i);
+        int maxSize = Math.max(basePlan.size(), finalPlan.size());
+
+        for (int i = 0; i < maxSize; i++) {
+            List<Subject> baseSemester = (i < basePlan.size()) ? basePlan.get(i) : new ArrayList<>();
+            List<Subject> finalSemester = (i < finalPlan.size()) ? finalPlan.get(i) : new ArrayList<>();
 
             if (!baseSemester.equals(finalSemester)) {
                 System.out.println("Changes in Semester " + (i + 1) + ":");
@@ -33,7 +36,6 @@ public class SubjectPlanUtils {
         return difference;
     }
 
-    // New method: Flatten a nested list of subjects into a set of subject codes
     public static Set<String> flattenPlan(List<List<Subject>> plan) {
         Set<String> subjectCodes = new HashSet<>();
         for (List<Subject> semester : plan) {

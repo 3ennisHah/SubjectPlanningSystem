@@ -47,6 +47,21 @@ public class Subject {
         return subjectYear;
     }
 
+    // New method to check if the subject belongs to Year 1
+    public boolean isYear1() {
+        return subjectYear == 1;
+    }
+
+    // New method to check if the subject belongs to Year 2
+    public boolean isYear2() {
+        return subjectYear == 2;
+    }
+
+    // New method to check if the subject belongs to Year 3
+    public boolean isYear3() {
+        return subjectYear == 3;
+    }
+
     public boolean isInternationalOnly() {
         return internationalOnly;
     }
@@ -70,6 +85,10 @@ public class Subject {
     // Check if this subject has a prerequisite
     public boolean hasPrerequisite() {
         return prerequisites.length > 0;
+    }
+
+    public boolean isElective() {
+        return this.subjectCode.startsWith("Elective") || this.subjectCode.startsWith("FreeElective");
     }
 
     @Override

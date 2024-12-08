@@ -14,7 +14,8 @@ public class Main {
         System.out.println("1. Alice Perfect (2024 January Intake)");
         System.out.println("2. May International (2024 January Intake)");
         System.out.println("3. Bob Failing Y1 Subject (2024 Math March Intake)");
-        System.out.print("Enter your choice (1/2/3): ");
+        System.out.println("4. Mark International (2024 August Intake)");
+        System.out.print("Enter your choice (1/2/3/4): ");
 
         int choice = scanner.nextInt();
         Student selectedStudent = Student.getStudentByChoice(choice, null);
