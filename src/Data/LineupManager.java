@@ -9,7 +9,6 @@
             initializeBCS2024JanuaryLineup();
             initializeBCS2024MathMarchLineup(); // Ensure this is called
             initializeBCS2024AugustLineup();
-            initializeDirectEntryY2JanuaryLineup();
         }
 
         private static void initializeBCS2024JanuaryLineup() {
@@ -226,33 +225,32 @@
             PROGRAMME_LINEUPS.put("BCS2024MathJanuary", bcs2024MathJanuary);
         }
 
-        // Initialize Direct Entry Y2 January 2024 Intake
-        private static void initializeDirectEntryY2JanuaryLineup() {
-            Map<String, List<Subject>> directEntryY2January = new LinkedHashMap<>();
+        public static Map<String, List<Subject>> getLineupForCohort(String cohort, boolean isInternational) {
+            Map<String, List<Subject>> basePlan = PROGRAMME_LINEUPS.getOrDefault(cohort, null);
+            if (basePlan == null) {
+                return null;
+            }
 
-            directEntryY2January.put("Semester4", List.of(
-                    Subject.BIS2212, // Social & Professional Responsibilities
-                    Subject.MPU3193, // Falsafah dan Isu Semasa
-                    Subject.MPU3183, // Penghayatan Etika dan Peradaban
-                    Subject.CSC2103, // Data Structure & Algorithms
-                    Subject.PRG2104, // Object-Oriented Programming
-                    Subject.ENG2044, // Communication Skills
-                    Subject.CSC2014  // Digital Image Processing
-            )); // Total Credit Hours: 22
+            Map<String, List<Subject>> adjustedPlan = new LinkedHashMap<>();
 
-            directEntryY2January.put("Semester5", List.of(
-                    Subject.MPU3222, // Entrepreneurial Mindset and Skills
-                    Subject.MPU3412, // Community Service for Planetary Health
-                    Subject.FreeElective1, // Free Elective
-                    Subject.FreeElective2, // Free Elective
-                    Subject.SEG2202, // Software Engineering
-                    Subject.Elective1  // Elective 1
-            )); // Total Credit Hours: 16
+            for (Map.Entry<String, List<Subject>> entry : basePlan.entrySet()) {
+                List<Subject> adjustedSubjects = new ArrayList<>();
+                for (Subject subject : entry.getValue()) {
+                    if (isInternational) {
+                        if (subject == Subject.MPU3193) {
+                            adjustedSubjects.add(Subject.MPU3203); // Replace MPU3193 with MPU3203
+                        } else if (subject == Subject.MPU3183) {
+                            adjustedSubjects.add(Subject.MPU3213); // Replace MPU3183 with MPU3213
+                        } else {
+                            adjustedSubjects.add(subject);
+                        }
+                    } else {
+                        adjustedSubjects.add(subject);
+                    }
+                }
+                adjustedPlan.put(entry.getKey(), adjustedSubjects);
+            }
 
-            PROGRAMME_LINEUPS.put("DirectEntryY2January", directEntryY2January);
-        }
-
-        public static Map<String, List<Subject>> getLineupForCohort(String cohort) {
-            return PROGRAMME_LINEUPS.getOrDefault(cohort, null);
+            return adjustedPlan;
         }
     }

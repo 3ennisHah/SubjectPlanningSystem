@@ -12,8 +12,8 @@ public class Main {
 
         System.out.println("Select a student to display their subject plan:");
         System.out.println("1. Alice Perfect (2024 January Intake)");
-        System.out.println("2. Bob NoMath (2024 Math March Intake)");
-        System.out.println("3. Charlie Retry (2024 August Intake)");
+        System.out.println("2. May International (2024 January Intake)");
+        System.out.println("3. Bob Failing Y1 Subject (2024 Math March Intake)");
         System.out.print("Enter your choice (1/2/3): ");
 
         int choice = scanner.nextInt();
@@ -28,7 +28,8 @@ public class Main {
         String cohortKey = selectedStudent.constructCohortKey();
         System.out.println("Debug: Constructed cohort key is " + cohortKey);
 
-        Map<String, List<Subject>> baseLineupMap = planner.initializeBaseLineup(cohortKey);
+        // Pass the student's international status to the initializeBaseLineup method
+        Map<String, List<Subject>> baseLineupMap = planner.initializeBaseLineup(cohortKey, selectedStudent.isInternational());
         if (baseLineupMap == null || baseLineupMap.isEmpty()) {
             System.out.println("Error: Unable to retrieve a valid base lineup for the student.");
             return;

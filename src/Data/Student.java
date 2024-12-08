@@ -10,6 +10,7 @@ public class Student {
     private List<Subject> failedSubjects;
     private boolean directEntry;
     private boolean mathRequirement;
+    private boolean international; // Indicates if the student is an international student
     private String enrollmentYear;
     private String enrollmentIntake;
     private int currentSemester;
@@ -22,6 +23,7 @@ public class Student {
         this.failedSubjects = new ArrayList<>();
         this.directEntry = false;
         this.mathRequirement = false;
+        this.international = false; // Default to false
         this.enrollmentYear = enrollmentYear;
         this.enrollmentIntake = enrollmentIntake;
         this.currentSemester = currentSemester;
@@ -34,6 +36,14 @@ public class Student {
 
     public String getName() {
         return name;
+    }
+
+    public boolean isInternational() {
+        return international;
+    }
+
+    public void setInternational(boolean international) {
+        this.international = international;
     }
 
     public Set<Subject> getCompletedSubjects() {
@@ -141,6 +151,7 @@ public class Student {
                 ", failedSubjects=" + failedSubjects +
                 ", directEntry=" + directEntry +
                 ", mathRequirement=" + mathRequirement +
+                ", international=" + international +
                 ", enrollmentYear='" + enrollmentYear + '\'' +
                 ", enrollmentIntake='" + enrollmentIntake + '\'' +
                 ", currentSemester=" + currentSemester +
@@ -153,6 +164,8 @@ public class Student {
         switch (choice) {
             case 1: // Alice Perfect
                 student = new Student("S1001", "Alice Perfect", "2024", "January", 5); // Current semester is 5
+                student.setInternational(false); // Alice is not an international student
+
                 student.addCompletedSubject(Subject.CSC1024);
                 student.addCompletedSubject(Subject.MPU3193);
                 student.addCompletedSubject(Subject.MPU3183);
@@ -171,22 +184,45 @@ public class Student {
                 student.addCompletedSubject(Subject.KIAR);
                 break;
 
-            case 2: // Bob NoMath (March 2024 Intake, Semester 3)
-                student = new Student("S1002", "Bob NoMath", "2024", "MathMarch", 3);
+            case 2: // May (International Student in January 2024 Intake, Semester 4)
+                student = new Student("S1003", "May International", "2024", "January", 4); // Current semester is 4
+                student.setInternational(true); // May is an international student
+
+                // Completed subjects up to semester 3
+                student.addCompletedSubject(Subject.CSC1024); // Programming Principles
+                student.addCompletedSubject(Subject.MPU3203); // Appreciation of Ethics and Civilisation (International alternative to MPU3193)
+                student.addCompletedSubject(Subject.MPU3213); // Malay Language for Communication 2 (International alternative to MPU3183)
+                student.addCompletedSubject(Subject.MAT1013); // Micro-credential in Computer Mathematics Fundamentals
+                student.addCompletedSubject(Subject.ENG1044); // English for Computer Technology Studies
+                student.addCompletedSubject(Subject.CSC1202); // Computer Organisation
+                student.addCompletedSubject(Subject.MTH1114); // Computer Mathematics
+                student.addCompletedSubject(Subject.PRG1203); // Object-Oriented Programming Fundamentals
+                student.addCompletedSubject(Subject.SEG1201); // Database Fundamentals
+                student.addCompletedSubject(Subject.NET1014); // Networking Principles
+                student.addCompletedSubject(Subject.CSC2104); // Operating System Fundamentals
+                student.addCompletedSubject(Subject.WEB1201); // Web Fundamentals
+                break;
+
+            case 3: // Bob NoMath (March 2024 Intake, Semester 3)
+                student = new Student("S1002", "Bob (Fail Y1 Subjects)", "2024", "MathMarch", 3);
+                student.setInternational(false); // Bob is not an international student
 
                 // Completed subjects that do not align with Semesters 1 and 2
                 student.addCompletedSubject(Subject.ENG1044);  // English for Computer Technology Studies
                 student.addCompletedSubject(Subject.CSC1202);  // Computer Organisation
                 student.addCompletedSubject(Subject.CSC1024);  // Programming Principles
                 student.addCompletedSubject(Subject.MAT1013);  // Micro-credential in Computer Mathematics Fundamentals
-                student.addCompletedSubject(Subject.CSC2103);  // Data Structure and Algorithms (not from Semester 1 or 2)
                 student.addCompletedSubject(Subject.SEG1201);  // Database Fundamentals
                 student.addCompletedSubject(Subject.PRG1203);  // Object-Oriented Programming Fundamentals
                 student.addCompletedSubject(Subject.CSC2104);  // Operating System Fundamentals
                 student.addCompletedSubject(Subject.MTH1114);  // Computer Mathematics
+
+                // Failed subjects
+                student.getFailedSubjects().add(Subject.WEB1201);  // Failed Web Fundamentals
                 break;
         }
 
         return student;
     }
+
 }

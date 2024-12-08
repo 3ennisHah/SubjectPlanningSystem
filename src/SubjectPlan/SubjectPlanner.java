@@ -10,8 +10,9 @@ import java.util.Map;
 public class SubjectPlanner {
     private final GeneticAlgorithm geneticAlgorithm = new GeneticAlgorithm();
 
-    public Map<String, List<Subject>> initializeBaseLineup(String cohortKey) {
-        return LineupManager.getLineupForCohort(cohortKey);
+    public Map<String, List<Subject>> initializeBaseLineup(String cohortKey, boolean isInternational) {
+        // Pass both the cohort key and the international status
+        return LineupManager.getLineupForCohort(cohortKey, isInternational);
     }
 
     public List<List<Subject>> convertToPlanList(Map<String, List<Subject>> lineupMap) {
@@ -23,14 +24,11 @@ public class SubjectPlanner {
     }
 
     public Chromosome runGeneticAlgorithm(Student student, List<List<Subject>> basePlan) {
-        // Filter and lock prior semesters
+        // Step 1: Filter and lock prior semesters
         List<List<Subject>> adjustedPlan = filterAndFixSemesters(basePlan, student);
 
-        // Flatten all subjects for optimization
-        List<Subject> allSubjects = flattenSubjects(basePlan);
-
-        // Run genetic algorithm on the filtered plan
-        return geneticAlgorithm.evolve(adjustedPlan, student, allSubjects);
+        // Step 2: Run optimization logic
+        return geneticAlgorithm.optimizePlan(adjustedPlan, student, student.getFailedSubjects());
     }
 
     private List<List<Subject>> filterAndFixSemesters(List<List<Subject>> basePlan, Student student) {
@@ -54,13 +52,5 @@ public class SubjectPlanner {
         }
 
         return adjustedPlan;
-    }
-
-    private List<Subject> flattenSubjects(List<List<Subject>> basePlan) {
-        List<Subject> allSubjects = new ArrayList<>();
-        for (List<Subject> semester : basePlan) {
-            allSubjects.addAll(semester);
-        }
-        return allSubjects;
     }
 }
