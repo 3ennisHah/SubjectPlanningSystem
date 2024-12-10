@@ -2,40 +2,52 @@ package Operators;
 
 import Data.Chromosome;
 import Data.Subject;
-import SubjectPlan.SubjectPlanUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
 
 public class MutationOperator {
 
-    private final Random random = new Random();
+    public Chromosome mutateChromosome(Chromosome chromosome) {
+        Random random = new Random();
+        int semesterPlanSize = chromosome.getSemesterPlan().size();
 
-    public Chromosome mutateChromosome(Chromosome chromosome, List<Subject> allSubjects) {
-        // Example mutation logic
-        int semesterIndex = random.nextInt(chromosome.getSemesterPlan().size());
-        List<Subject> semester = chromosome.getSemesterPlan().get(semesterIndex);
-
-        if (!semester.isEmpty()) {
-            int subjectIndex = random.nextInt(semester.size());
-            Subject subject = semester.get(subjectIndex);
-
-            // Debug before mutation
-            System.out.println("[DEBUG] Mutating subject: " + subject + " in semester " + (semesterIndex + 1));
-
-            // Replace with a random subject
-            Subject newSubject = allSubjects.get(random.nextInt(allSubjects.size()));
-            Set<String> existingSubjects = SubjectPlanUtils.flattenPlan(chromosome.getSemesterPlan());
-
-            if (!existingSubjects.contains(newSubject.getSubjectCode())) {
-                semester.set(subjectIndex, newSubject);
-            }
-
-            // Debug after mutation
-            System.out.println("[DEBUG] Semester after mutation: " + semester);
+        if (semesterPlanSize > 0) {
+            int randomIndex = random.nextInt(semesterPlanSize);
+            System.out.println("[DEBUG] Mutating semester at index: " + randomIndex);
+            mutateSemester(chromosome, randomIndex);
+        } else {
+            System.out.println("[DEBUG] Mutation skipped: Semester plan size is zero.");
         }
 
+        // Ensure no duplicate subjects across all semesters
+        removeGlobalDuplicates(chromosome);
+
         return chromosome;
+    }
+
+    private void mutateSemester(Chromosome chromosome, int semesterIndex) {
+        if (semesterIndex < chromosome.getSemesterPlan().size()) {
+            List<Subject> newSemester = generateRandomSemester();
+            chromosome.getSemesterPlan().set(semesterIndex, newSemester);
+            System.out.println("[DEBUG] Mutated semester at index " + semesterIndex + " with new subjects.");
+        } else {
+            System.out.println("[DEBUG] Mutation skipped: Invalid semester index.");
+        }
+    }
+
+    private List<Subject> generateRandomSemester() {
+        // Placeholder logic to generate valid subjects for a semester
+        return new ArrayList<>();
+    }
+
+    private void removeGlobalDuplicates(Chromosome chromosome) {
+        List<Subject> seenSubjects = new ArrayList<>();
+        for (List<Subject> semester : chromosome.getSemesterPlan()) {
+            semester.removeIf(seenSubjects::contains);
+            seenSubjects.addAll(semester);
+        }
+        System.out.println("[DEBUG] Removed global duplicate subjects after mutation.");
     }
 }

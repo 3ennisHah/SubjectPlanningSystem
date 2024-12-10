@@ -3,7 +3,7 @@
     import java.util.*;
 
     public class LineupManager {
-        private static final Map<String, Map<String, List<Subject>>> PROGRAMME_LINEUPS = new HashMap<>();
+        public static final Map<String, Map<String, List<Subject>>> PROGRAMME_LINEUPS = new HashMap<>();
 
         static {
             initializeBCS2024JanuaryLineup();
@@ -237,17 +237,28 @@
         }
 
         public static Map<String, List<Subject>> getLineupForCohort(String cohort, boolean isInternational) {
-            Map<String, List<Subject>> basePlan = PROGRAMME_LINEUPS.getOrDefault(cohort, null);
-            if (basePlan == null) {
-                return null;
+            System.out.println("[DEBUG] Requested cohort key: " + cohort);
+
+            // Check for the cohort key in a case-insensitive manner
+            Optional<String> matchingCohort = PROGRAMME_LINEUPS.keySet().stream()
+                    .filter(key -> key.equalsIgnoreCase(cohort))
+                    .findFirst();
+
+            if (matchingCohort.isEmpty()) {
+                System.out.println("[DEBUG] No base plan found for cohort: " + cohort);
+                System.out.println("[DEBUG] Available cohorts: " + PROGRAMME_LINEUPS.keySet());
+                return new LinkedHashMap<>(); // Return an empty map instead of null
             }
 
-            Map<String, List<Subject>> adjustedPlan = new LinkedHashMap<>();
+            String resolvedCohortKey = matchingCohort.get();
+            Map<String, List<Subject>> basePlan = PROGRAMME_LINEUPS.get(resolvedCohortKey);
 
+            Map<String, List<Subject>> adjustedPlan = new LinkedHashMap<>();
             for (Map.Entry<String, List<Subject>> entry : basePlan.entrySet()) {
                 List<Subject> adjustedSubjects = new ArrayList<>();
                 for (Subject subject : entry.getValue()) {
                     if (isInternational) {
+                        // Replace MPU subjects for international students
                         if (subject == Subject.MPU3193) {
                             adjustedSubjects.add(Subject.MPU3203); // Replace MPU3193 with MPU3203
                         } else if (subject == Subject.MPU3183) {
@@ -264,4 +275,6 @@
 
             return adjustedPlan;
         }
+
+
     }

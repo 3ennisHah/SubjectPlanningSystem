@@ -6,19 +6,20 @@ import Data.Population;
 import java.util.Random;
 
 public class SelectionOperator {
-
     private final Random random = new Random();
 
     public Chromosome selectParent(Population population) {
-        double totalFitness = population.getChromosomes().stream().mapToDouble(Chromosome::getFitness).sum();
-        double rouletteWheelPosition = random.nextDouble() * totalFitness;
-        double spinWheel = 0.0;
-        for (Chromosome chromosome : population.getChromosomes()) {
-            spinWheel += chromosome.getFitness();
-            if (spinWheel >= rouletteWheelPosition) {
-                return chromosome;
-            }
+        // Tournament selection: pick the best chromosome from a random subset
+        int tournamentSize = Math.min(3, population.size()); // Ensure valid tournament size
+        Population tournament = new Population();
+
+        for (int i = 0; i < tournamentSize; i++) {
+            Chromosome randomChromosome = population.getChromosomes().get(random.nextInt(population.size()));
+            tournament.addChromosome(randomChromosome);
         }
-        return population.getChromosomes().get(random.nextInt(population.size()));
+
+        Chromosome fittest = tournament.getFittest();
+        System.out.println("[DEBUG] Selected fittest chromosome with fitness: " + fittest.getFitness());
+        return fittest;
     }
 }

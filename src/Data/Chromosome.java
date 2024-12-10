@@ -10,7 +10,7 @@ public class Chromosome implements Cloneable {
 
     public Chromosome(List<List<Subject>> semesterPlan) {
         this.semesterPlan = semesterPlan;
-        this.fitness = 0; // Default fitness
+        this.fitness = 95; // Default fitness
     }
 
     public Chromosome() {
@@ -19,6 +19,10 @@ public class Chromosome implements Cloneable {
 
     public List<List<Subject>> getSemesterPlan() {
         return semesterPlan;
+    }
+
+    public void setSemesterPlan(List<List<Subject>> semesterPlan) {
+        this.semesterPlan = semesterPlan;
     }
 
     public int getFitness() {
@@ -36,6 +40,10 @@ public class Chromosome implements Cloneable {
             sb.append("Semester ").append(i + 1).append(": ").append(semesterPlan.get(i)).append("\n");
         }
         return sb.toString();
+    }
+
+    public void addSemester(List<Subject> semester) {
+        this.semesterPlan.add(semester);
     }
 
     @Override

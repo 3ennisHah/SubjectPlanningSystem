@@ -74,8 +74,33 @@ public class Student {
         return "BCS";
     }
 
+    public enum IntakeNaming {
+        MARCH("MathMarch"),
+        AUGUST("August"),
+        JANUARY("January");
+
+        private final String cohortName;
+
+        IntakeNaming(String cohortName) {
+            this.cohortName = cohortName;
+        }
+
+        public String getCohortName() {
+            return cohortName;
+        }
+
+        public static String resolve(String intake) {
+            for (IntakeNaming naming : values()) {
+                if (naming.name().equalsIgnoreCase(intake)) {
+                    return naming.getCohortName();
+                }
+            }
+            return intake; // Default to the original intake if no match
+        }
+    }
+
     public String constructCohortKey() {
-        String sanitizedIntake = getEnrollmentIntake().equals("March") ? "MathMarch" : getEnrollmentIntake();
+        String sanitizedIntake = IntakeNaming.resolve(getEnrollmentIntake());
         String cohortKey = getProgrammeCode() + getEnrollmentYear() + sanitizedIntake;
         System.out.println("[DEBUG] Constructed cohort key: " + cohortKey);
         return cohortKey;
@@ -131,16 +156,6 @@ public class Student {
         return completedSubjects.stream()
                 .map(Subject::getSubjectCode)
                 .collect(Collectors.toSet());
-    }
-
-    // Returns the original semester of a given subject
-    public int findOriginalSemesterForSubject(Subject subject) {
-        for (int semesterIndex = 0; semesterIndex < basePlan.size(); semesterIndex++) {
-            if (basePlan.get(semesterIndex).contains(subject)) {
-                return semesterIndex + 1; // Semester index is zero-based
-            }
-        }
-        return -1; // Subject not found
     }
 
     public String getIntakeMonth() {
