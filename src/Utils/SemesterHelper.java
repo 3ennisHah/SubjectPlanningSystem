@@ -7,8 +7,6 @@ import Data.Student;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 public class SemesterHelper {
     public static final int MAX_CREDITS_LONG_SEMESTER = 19;
@@ -18,22 +16,20 @@ public class SemesterHelper {
         int maxCredits = getMaxCredits(semesterIndex, student);
         int currentCredits = semester.stream().mapToInt(Subject::getCreditHours).sum();
 
-        // Check if the subject can be offered in the current semester
         boolean isOffered = isSemesterValidForSubject(semesterIndex + 1, subject, student);
 
         if (!isOffered) {
-            System.out.println("[DEBUG] Semester " + (semesterIndex + 1) + " is not valid for " + subject.getSubjectCode() +
-                    ". Reason: Subject not offered in this semester.");
+            System.out.println("[DEBUG] Semester " + (semesterIndex + 1) + " is not valid for " + subject.getSubjectCode() + ". Subject not offered in this semester.");
             return false;
         }
 
-        boolean canFit = currentCredits + subject.getCreditHours() <= maxCredits;
-        if (!canFit) {
-            System.out.println("[DEBUG] Semester " + (semesterIndex + 1) + " is not valid for " + subject.getSubjectCode() +
-                    ". Reason: Credit limit exceeded.");
+        if (currentCredits + subject.getCreditHours() > maxCredits) {
+            System.out.println("[DEBUG] Semester " + (semesterIndex + 1) + " cannot fit " + subject.getSubjectCode() + ". Credit limit exceeded.");
+            return false;
         }
 
-        return isOffered && canFit;
+        System.out.println("[DEBUG] Semester " + (semesterIndex + 1) + " can fit " + subject.getSubjectCode());
+        return true;
     }
 
     public static int getMaxCredits(int semesterIndex, Student student) {
@@ -47,8 +43,16 @@ public class SemesterHelper {
 
     public static String getSemesterMonth(int semesterIndex, Student student) {
         List<String> semesterCycle = List.of("January", "March", "August");
+
+        // Get the intake month from the cohort
+        String intakeMonth = extractIntakeMonthFromCohort(student.getCohort());
+        int startMonthIndex = semesterCycle.indexOf(intakeMonth);
+
+        if (startMonthIndex == -1) {
+            throw new IllegalArgumentException("Invalid cohort or intake month: " + student.getCohort());
+        }
+
         int offset = semesterIndex % semesterCycle.size();
-        int startMonthIndex = semesterCycle.indexOf(student.getIntakeMonth());
         return semesterCycle.get((startMonthIndex + offset) % semesterCycle.size());
     }
 
@@ -78,8 +82,7 @@ public class SemesterHelper {
 
         for (int i = currentSemesterIndex + 1; i < plan.size(); i++) {
             if (canFitInSemester(plan.get(i), subject, i, student)) {
-                plan.get(i).add(subject);
-                System.out.println("[DEBUG] Placed subject " + subject.getSubjectCode() + " in semester " + (i + 1));
+                System.out.println("[DEBUG] Found valid semester for " + subject.getSubjectCode() + " at semester " + (i + 1));
                 return i;
             }
         }
@@ -93,9 +96,6 @@ public class SemesterHelper {
         while (plan.size() < nextSemesterNumber) {
             plan.add(new ArrayList<>());
         }
-
-        plan.get(nextSemesterNumber - 1).add(subject);
-        System.out.println("[DEBUG] Placed subject " + subject.getSubjectCode() + " in semester " + nextSemesterNumber);
 
         return nextSemesterNumber - 1;
     }
@@ -121,12 +121,11 @@ public class SemesterHelper {
     }
 
     private static int getInitialOfferingSemester(Subject subject, Student student) {
-        String cohortKey = "BCS" + student.getEnrollmentYear() + student.getIntakeMonth();
+        String cohortKey = "BCS" + extractEnrollmentYearFromCohort(student.getCohort()) + extractIntakeMonthFromCohort(student.getCohort());
         Map<String, List<Subject>> lineup = LineupManager.getLineupForCohort(cohortKey, student.isInternational());
 
         if (lineup == null || lineup.isEmpty()) {
-            System.out.println("[DEBUG] No lineup available for cohort key: " + cohortKey);
-            return 1; // Default to semester 1 if no lineup exists
+            return 1; // Default to semester 1
         }
 
         for (int i = 0; i < 9; i++) {
@@ -138,4 +137,21 @@ public class SemesterHelper {
         return 1; // Default to semester 1 if subject not found
     }
 
+
+    private static String extractIntakeMonthFromCohort(String cohort) {
+        switch (cohort.substring(4, 6)) {
+            case "01":
+                return "January";
+            case "04":
+                return "March";
+            case "09":
+                return "August";
+            default:
+                throw new IllegalArgumentException("Unknown intake month in cohort: " + cohort);
+        }
+    }
+
+    private static String extractEnrollmentYearFromCohort(String cohort) {
+        return cohort.substring(0, 4);
+    }
 }

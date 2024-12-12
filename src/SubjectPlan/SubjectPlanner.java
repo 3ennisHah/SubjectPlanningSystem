@@ -39,7 +39,6 @@ public class SubjectPlanner {
         return lineup;
     }
 
-
     public List<List<Subject>> convertToPlanList(Map<String, List<Subject>> lineupMap) {
         List<List<Subject>> planList = new ArrayList<>();
         for (Map.Entry<String, List<Subject>> entry : lineupMap.entrySet()) {
@@ -53,29 +52,53 @@ public class SubjectPlanner {
             System.out.println("[ERROR] Base plan is empty or null. Cannot run genetic algorithm.");
             return null;
         }
+
+        // Adjust the base plan to match the student's progress
         List<List<Subject>> adjustedPlan = filterAndFixSemesters(basePlan, student);
-        return geneticAlgorithm.optimizePlan(adjustedPlan, student, student.getFailedSubjects());
+
+        // Use the failing subjects from the updated Student class
+        List<DatabaseSubject> failingSubjects = student.getFailingSubjects();
+        List<Subject> failingSubjectList = new ArrayList<>();
+        for (DatabaseSubject dbSubject : failingSubjects) {
+            // Map DatabaseSubject to Subject
+            failingSubjectList.add(new Subject(
+                    dbSubject.getSubjectCode(),
+                    dbSubject.getSubjectName(),
+                    0,               // Default credit hours, update if available
+                    new String[]{},  // Default prerequisites, update if available
+                    true,            // Assume failing subjects are core
+                    1,               // Default subject year, update if available
+                    false            // Assume not international-only, update if needed
+            ));
+        }
+
+        // Run the genetic algorithm using the adjusted plan and failing subjects
+        return geneticAlgorithm.optimizePlan(adjustedPlan, student, failingSubjectList);
     }
 
     private List<List<Subject>> filterAndFixSemesters(List<List<Subject>> basePlan, Student student) {
         List<List<Subject>> adjustedPlan = new ArrayList<>();
-        int currentSemester = student.getCurrentSemester();
+        String currentSemester = student.getCurrentSemester();
 
         for (int i = 0; i < basePlan.size(); i++) {
-            if (i < currentSemester - 1) {
+            String semesterKey = "Semester " + (i + 1);
+
+            // If the semester is before the student's current semester
+            if (!currentSemester.equals("Unknown") && semesterKey.compareTo(currentSemester) < 0) {
                 List<Subject> completedSubjects = new ArrayList<>();
                 for (Subject subject : basePlan.get(i)) {
-                    if (student.getCompletedSubjectCodes().contains(subject.getSubjectCode())) {
+                    if (student.getCompletedSubjects().contains(subject)) {
                         completedSubjects.add(subject);
                     } else {
-                        System.out.println("[DEBUG] Removing incomplete subject " + subject.getSubjectCode() + " from Semester " + (i + 1));
+                        System.out.println("[DEBUG] Removing incomplete subject " + subject.getSubjectCode() + " from " + semesterKey);
                     }
                 }
                 adjustedPlan.add(completedSubjects);
-                System.out.println("[DEBUG] Fixed Semester " + (i + 1) + ": " + completedSubjects);
+                System.out.println("[DEBUG] Fixed " + semesterKey + ": " + completedSubjects);
             } else {
+                // Add the semester as-is if it's at or after the current semester
                 adjustedPlan.add(new ArrayList<>(basePlan.get(i)));
-                System.out.println("[DEBUG] Keeping Semester " + (i + 1) + " as-is: " + basePlan.get(i));
+                System.out.println("[DEBUG] Keeping " + semesterKey + " as-is: " + basePlan.get(i));
             }
         }
         return adjustedPlan;

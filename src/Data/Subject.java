@@ -1,6 +1,8 @@
 package Data;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Subject {
     private String subjectCode;
@@ -10,6 +12,9 @@ public class Subject {
     private boolean isCore; // Indicates if the subject is core or elective
     private int subjectYear; // Indicates the year the subject is typically taken (1, 2, or 3)
     private boolean internationalOnly; // Indicates if the subject is for international students only
+    private boolean completed; // Indicates if the subject has been completed by the student
+
+    private static final Map<String, Subject> SUBJECT_REGISTRY = new HashMap<>();
 
     // Constructor
     public Subject(String subjectCode, String subjectName, int creditHours, String[] prerequisites, boolean isCore, int subjectYear, boolean internationalOnly) {
@@ -20,12 +25,18 @@ public class Subject {
         this.isCore = isCore;
         this.subjectYear = subjectYear;
         this.internationalOnly = internationalOnly;
+        this.completed = false; // Default to not completed
+    }
+
+    public static Subject valueOf(String subjectCode) {
+        return SUBJECT_REGISTRY.get(subjectCode);
     }
 
     // Getters
     public String getSubjectCode() {
         return subjectCode;
     }
+
 
     public String getSubjectName() {
         return subjectName;
@@ -47,6 +58,19 @@ public class Subject {
         return subjectYear;
     }
 
+    public boolean isInternationalOnly() {
+        return internationalOnly;
+    }
+
+    public boolean isCompleted() {
+        return completed;
+    }
+
+    // Setter for completed
+    public void setCompleted(boolean completed) {
+        this.completed = completed;
+    }
+
     // New method to check if the subject belongs to Year 1
     public boolean isYear1() {
         return subjectYear == 1;
@@ -62,27 +86,6 @@ public class Subject {
         return subjectYear == 3;
     }
 
-    public boolean isInternationalOnly() {
-        return internationalOnly;
-    }
-
-    // Helper method to retrieve the first prerequisite as a Subject
-    public Subject getPrerequisite(List<Subject> allSubjects) {
-        if (prerequisites.length == 0) {
-            return null; // No prerequisites
-        }
-
-        String prerequisiteCode = prerequisites[0]; // Assume only one prerequisite for simplicity
-        for (Subject subject : allSubjects) {
-            if (subject.getSubjectCode().equals(prerequisiteCode)) {
-                return subject; // Return the prerequisite subject
-            }
-        }
-
-        return null; // Prerequisite not found
-    }
-
-    // Check if this subject has a prerequisite
     public boolean hasPrerequisite() {
         return prerequisites.length > 0;
     }
