@@ -1,7 +1,6 @@
 package Data;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class Subject {
@@ -26,6 +25,11 @@ public class Subject {
         this.subjectYear = subjectYear;
         this.internationalOnly = internationalOnly;
         this.completed = false; // Default to not completed
+
+        // Register the subject in the registry, avoiding duplicates
+        if (!SUBJECT_REGISTRY.containsKey(subjectCode)) {
+            SUBJECT_REGISTRY.put(subjectCode, this);
+        }
     }
 
     public static Subject valueOf(String subjectCode) {
@@ -109,9 +113,9 @@ public class Subject {
     public static final Subject NET1014 = new Subject("NET1014", "Networking Principles", 4, new String[]{}, true, 1, false);
     public static final Subject CSC2104 = new Subject("CSC2104", "Operating System Fundamentals", 4, new String[]{}, true, 1, false);
     public static final Subject WEB1201 = new Subject("WEB1201", "Web Fundamentals", 4, new String[]{}, true, 1, false);
-    public static final Subject MPU3193 = new Subject("MPU3193", "Falsafah dan Isu Semasa", 3, new String[]{}, false, 1, false);
+    public static final Subject MPU3122 = new Subject("MPU3122", "Falsafah dan Isu Semasa", 3, new String[]{}, false, 1, false);
     public static final Subject MPU3203 = new Subject("MPU3203", "Appreciation of Ethics and Civilisation", 3, new String[]{}, false, 1, true);
-    public static final Subject MPU3183 = new Subject("MPU3183", "Penghayatan Etika dan Peradaban", 3, new String[]{}, false, 1, false);
+    public static final Subject MPU3112 = new Subject("MPU3112", "Penghayatan Etika dan Peradaban", 3, new String[]{}, false, 1, false);
     public static final Subject MPU3213 = new Subject("MPU3213", "Malay Language for Communication 2", 3, new String[]{}, false, 1, true);
     public static final Subject MPU3222 = new Subject("MPU3222", "Entrepreneurial Mindset and Skills", 2, new String[]{}, false, 2, false);
     public static final Subject SEG2202 = new Subject("SEG2202", "Software Engineering", 4, new String[]{"PRG1203"}, true, 2, false);

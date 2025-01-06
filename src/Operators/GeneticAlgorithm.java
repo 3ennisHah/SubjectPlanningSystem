@@ -15,8 +15,8 @@ public class GeneticAlgorithm {
     private final CrossoverOperator crossoverOperator;
     private final MutationOperator mutationOperator;
 
-    private static final int MAX_GENERATIONS = 10;
-    private static final int POPULATION_SIZE = 10; // Updated for a better initial variety
+    private static final int MAX_GENERATIONS = 5; // 5 generations
+    private static final int POPULATION_SIZE = 1; // 1 population
     private static final double MUTATION_RATE = 0.1;
 
     public GeneticAlgorithm(
@@ -35,7 +35,20 @@ public class GeneticAlgorithm {
         this.mutationOperator = mutationOperator;
     }
 
+    /**
+     * Handles the overall plan generation for a student.
+     * - Displays the base plan if the student is "on track."
+     * - Optimizes the plan otherwise.
+     */
     public Chromosome optimizePlan(List<List<Subject>> basePlan, Student student, List<Subject> allSubjects) {
+        if (isStudentOnTrack(student)) {
+            System.out.println("[INFO] Student is on track. Displaying the base subject plan.");
+            SemesterHelper.displayPlan("Base Subject Plan", basePlan); // Display the base plan
+            return null; // No optimization required
+        }
+
+        // Continue with optimization for off-track students
+        System.out.println("[INFO] Student is off track. Optimizing subject plan...");
         matchDatabaseSubjects(student, basePlan);
 
         // Initialize the population
@@ -65,18 +78,31 @@ public class GeneticAlgorithm {
             bestChromosome.setSemesterPlan(fallbackPlan);
         }
 
-        displayOptimizedPlan(bestChromosome.getSemesterPlan());
         return bestChromosome;
     }
 
+
+
+    private boolean isStudentOnTrack(Student student) {
+        return student.getCompletedSubjects().isEmpty() && student.getFailingSubjects().isEmpty();
+    }
+
     private void matchDatabaseSubjects(Student student, List<List<Subject>> basePlan) {
+        List<Subject> completedSubjects = new ArrayList<>();
+
         for (List<Subject> semester : basePlan) {
             for (Subject subject : semester) {
                 boolean isCompleted = student.getAllSubjects().stream()
-                        .anyMatch(dbSubject -> dbSubject.getSubjectCode().equals(subject.getSubjectCode()));
+                        .anyMatch(dbSubject -> dbSubject.getSubjectCode().equals(subject.getSubjectCode()) && !dbSubject.isFailingGrade());
                 subject.setCompleted(isCompleted);
+                if (isCompleted) {
+                    completedSubjects.add(subject);
+                }
             }
         }
+
+        // Update student's completedSubjects list
+        student.setCompletedSubjects(completedSubjects);
     }
 
     private Population initializePopulation(List<List<Subject>> basePlan, Student student, List<Subject> allSubjects) {
@@ -84,7 +110,7 @@ public class GeneticAlgorithm {
         for (int i = 0; i < POPULATION_SIZE; i++) {
             List<List<Subject>> randomPlan = SemesterHelper.deepCopyPlan(basePlan);
             List<Subject> failingSubjects = mapDatabaseSubjectsToSubjects(student.getFailingSubjects());
-            placementHandler.placeFailedSubjects(failingSubjects, randomPlan, student);
+            placementHandler.placeFailedSubjects(failingSubjects, randomPlan, student, student.getAlgorithmSemester() - 1);
             semesterValidator.validateAndAdjustCreditHours(randomPlan, student);
             Chromosome chromosome = new Chromosome(randomPlan);
             population.addChromosome(chromosome);
@@ -123,8 +149,38 @@ public class GeneticAlgorithm {
     private List<List<Subject>> fallbackToUtils(List<List<Subject>> basePlan, Student student, List<Subject> allSubjects) {
         List<List<Subject>> optimizedPlan = SemesterHelper.deepCopyPlan(basePlan);
         semesterValidator.validateAndAdjustCreditHours(optimizedPlan, student);
+
         List<Subject> failingSubjects = mapDatabaseSubjectsToSubjects(student.getFailingSubjects());
-        placementHandler.placeFailedSubjects(failingSubjects, optimizedPlan, student);
+        for (Subject failingSubject : failingSubjects) {
+            boolean placed = false;
+            for (int i = student.getAlgorithmSemester() - 1; i < optimizedPlan.size(); i++) {
+                List<Subject> semester = optimizedPlan.get(i);
+
+                if (SemesterHelper.canFitInSemester(semester, failingSubject, i, student)) {
+                    semester.add(failingSubject);
+                    SemesterHelper.recalculateCreditHours(optimizedPlan, i);
+                    System.out.println("[DEBUG] Placed failing subject " + failingSubject.getSubjectCode() + " in semester " + (i + 1));
+                    placed = true;
+                    break;
+                }
+
+                // Attempt to displace if placement fails
+                if (SemesterHelper.attemptToDisplace(optimizedPlan, failingSubject, i, student)) {
+                    System.out.println("[DEBUG] Placed failing subject " + failingSubject.getSubjectCode() + " in semester " + (i + 1) + " after displacing another subject.");
+                    placed = true;
+                    break;
+                }
+            }
+
+            if (!placed) {
+                // If all attempts fail, create a new semester
+                System.out.println("[DEBUG] Creating a new semester for failing subject: " + failingSubject.getSubjectCode());
+                List<Subject> newSemester = new ArrayList<>();
+                newSemester.add(failingSubject);
+                optimizedPlan.add(newSemester);
+                SemesterHelper.recalculateCreditHours(optimizedPlan, optimizedPlan.size() - 1);
+            }
+        }
         return optimizedPlan;
     }
 
@@ -158,16 +214,5 @@ public class GeneticAlgorithm {
             }
         }
         return subjects;
-    }
-
-    private void displayOptimizedPlan(List<List<Subject>> plan) {
-        System.out.println("[INFO] Final Optimized Plan:");
-        for (int i = 0; i < plan.size(); i++) {
-            List<Subject> semester = plan.get(i);
-            System.out.println("Semester " + (i + 1) + ":");
-            for (Subject subject : semester) {
-                System.out.println(" - " + subject.getSubjectName() + " (" + subject.getSubjectCode() + ")");
-            }
-        }
     }
 }

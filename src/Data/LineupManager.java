@@ -15,8 +15,8 @@
             Map<String, List<Subject>> bcs2024January = new LinkedHashMap<>();
 
             bcs2024January.put("Semester1", List.of(
-                    Subject.MPU3193, // Falsafah dan Isu Semasa
-                    Subject.MPU3183, // Penghayatan Etika dan Peradaban
+                    Subject.MPU3122, // Falsafah dan Isu Semasa
+                    Subject.MPU3112, // Penghayatan Etika dan Peradaban
                     Subject.CSC1024  // Programming Principles
             )); // Total Credit Hours: 10
 
@@ -94,9 +94,9 @@
             )); // Total Credit Hours: 16
 
             bcs2024March.put("Semester3", List.of(
-                    Subject.MPU3193, // Falsafah dan Isu Semasa
+                    Subject.MPU3122, // Falsafah dan Isu Semasa
                     Subject.NET1014, // Networking Principles
-                    Subject.MPU3183  // Penghayatan Etika dan Peradaban
+                    Subject.MPU3112  // Penghayatan Etika dan Peradaban
             )); // Total Credit Hours: 10 (Short Semester)
 
             bcs2024March.put("Semester4", List.of(
@@ -152,8 +152,8 @@
             )); // Total Credit Hours: 16
 
             bcs2024August.put("Semester2", List.of(
-                    Subject.MPU3193, // Falsafah dan Isu Semasa
-                    Subject.MPU3183, // Penghayatan Etika dan Peradaban
+                    Subject.MPU3122, // Falsafah dan Isu Semasa
+                    Subject.MPU3112, // Penghayatan Etika dan Peradaban
                     Subject.NET1014  // Networking Principles
             )); // Total Credit Hours: 10 (Short Semester)
 
@@ -207,8 +207,6 @@
         }
 
         public static Map<String, List<Subject>> getLineupForCohort(String cohort, boolean isInternational) {
-            System.out.println("[DEBUG] Requested cohort key: " + cohort);
-
             // Check for the cohort key in a case-insensitive manner
             Optional<String> matchingCohort = PROGRAMME_LINEUPS.keySet().stream()
                     .filter(key -> key.equalsIgnoreCase(cohort))
@@ -229,9 +227,9 @@
                 for (Subject subject : entry.getValue()) {
                     if (isInternational) {
                         // Replace MPU subjects for international students
-                        if (subject == Subject.MPU3193) {
+                        if (subject == Subject.MPU3122) {
                             adjustedSubjects.add(Subject.MPU3203); // Replace MPU3193 with MPU3203
-                        } else if (subject == Subject.MPU3183) {
+                        } else if (subject == Subject.MPU3112) {
                             adjustedSubjects.add(Subject.MPU3213); // Replace MPU3183 with MPU3213
                         } else {
                             adjustedSubjects.add(subject);

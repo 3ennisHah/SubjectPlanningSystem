@@ -45,7 +45,7 @@ public class ExcelExporter {
         // Write the workbook to the file
         try (FileOutputStream outputStream = new FileOutputStream(filePath)) {
             workbook.write(outputStream);
-            System.out.println("[INFO] Excel file created successfully at: " + filePath);
+            System.out.println("Excel file created successfully at: " + filePath);
         } finally {
             workbook.close(); // Ensure the workbook is closed to free resources
         }

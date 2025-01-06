@@ -3,6 +3,7 @@ package SubjectPlan;
 import Data.*;
 import Operators.*;
 import Utils.PlacementHandler;
+import Utils.SemesterHelper;
 import Utils.SemesterValidator;
 
 import java.util.ArrayList;
@@ -74,6 +75,35 @@ public class SubjectPlanner {
 
         // Run the genetic algorithm using the adjusted plan and failing subjects
         return geneticAlgorithm.optimizePlan(adjustedPlan, student, failingSubjectList);
+    }
+
+    private boolean isStudentOnTrack(Student student) {
+        return student.getCompletedSubjects().isEmpty() && student.getFailingSubjects().isEmpty();
+    }
+
+    public void runPlanForStudent(Student student, String cohortKey, boolean isInternational) {
+        // Step 1: Initialize the base lineup for the cohort
+        Map<String, List<Subject>> baseLineup = initializeBaseLineup(cohortKey, isInternational);
+        if (baseLineup == null || baseLineup.isEmpty()) {
+            System.out.println("[ERROR] No base plan found for cohort: " + cohortKey);
+            return;
+        }
+
+        // Step 2: Convert the lineup map into a list-based plan
+        List<List<Subject>> basePlan = convertToPlanList(baseLineup);
+
+        // Step 3: Check if the student is "on track"
+        if (isStudentOnTrack(student)) {
+            System.out.println("[INFO] Student is on track. Displaying the base subject plan.");
+            SemesterHelper.displayPlan("Base Subject Plan", basePlan);
+            return; // Skip optimization for "on-track" students
+        }
+
+        // Step 4: Run the genetic algorithm for optimization
+        Chromosome optimizedPlan = runGeneticAlgorithm(student, basePlan);
+        if (optimizedPlan != null) {
+            SemesterHelper.displayPlan("Optimized Subject Plan", optimizedPlan.getSemesterPlan());
+        }
     }
 
     private List<List<Subject>> filterAndFixSemesters(List<List<Subject>> basePlan, Student student) {

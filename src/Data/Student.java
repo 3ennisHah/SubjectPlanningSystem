@@ -13,11 +13,13 @@ public class Student {
     private List<DatabaseSubject> allSubjects; // All subjects the student has taken
     private List<DatabaseSubject> failingSubjects; // Failing subjects from the database
     private List<Subject> completedSubjects; // Subjects the student has completed
-    private String currentSemester; // Current semester of the student (e.g., Semester 3)
-    private int algorithmSemester;
+    private int currentSemester; // Semester directly from the database
+    private int algorithmSemester; // Semester used for the genetic algorithm
+    private List<String> requiredElectives; // Electives the student is required to take
 
     // Constructor
-    public Student(int id, String name, String cohort, String status, String country, boolean isInternational, List<DatabaseSubject> allSubjects) {
+    public Student(int id, String name, String cohort, String status, String country, boolean isInternational,
+                   List<DatabaseSubject> allSubjects, int currentSemester) {
         this.id = id;
         this.name = name;
         this.cohort = cohort;
@@ -25,27 +27,105 @@ public class Student {
         this.country = country;
         this.isInternational = isInternational;
         this.allSubjects = allSubjects;
+        this.currentSemester = currentSemester; // Directly from the database
+        this.algorithmSemester = currentSemester + 1; // Assume next semester unless overridden
         this.failingSubjects = new ArrayList<>();
         this.completedSubjects = new ArrayList<>();
-        this.currentSemester = "Unknown"; // Default to "Unknown"
+        this.requiredElectives = new ArrayList<>(); // Initialize required electives
 
-        // Identify failing subjects
+        // Populate failing and completed subjects
         for (DatabaseSubject dbSubject : allSubjects) {
             if (dbSubject.isFailingGrade()) {
                 this.failingSubjects.add(dbSubject);
+            } else {
+                Subject completedSubject = Subject.valueOf(dbSubject.getSubjectCode());
+                if (completedSubject != null) {
+                    completedSubjects.add(completedSubject);
+                    completedSubject.setCompleted(true); // Mark as completed
+                } else {
+                    System.out.println("[WARN] Subject not found in registry: " + dbSubject.getSubjectCode());
+                }
             }
+        }
+
+        // Populate required electives (Placeholder logic; replace with actual requirements)
+        populateRequiredElectives();
+    }
+
+    // ******** New Methods ******** //
+
+    /**
+     * Checks if a semester is a short semester for this student based on the semester index.
+     */
+    public boolean isShortSemester(int semesterIndex) {
+        String semesterMonth = getSemesterMonth(semesterIndex);
+        return semesterMonth.equalsIgnoreCase("January");
+    }
+
+    /**
+     * Gets the semester month based on the semester index and the student's cohort.
+     */
+    public String getSemesterMonth(int semesterIndex) {
+        List<String> semesterCycle = List.of("January", "March", "August");
+        String intakeMonth = extractIntakeMonthFromCohort();
+        int startMonthIndex = semesterCycle.indexOf(intakeMonth);
+
+        if (startMonthIndex == -1) {
+            throw new IllegalArgumentException("Invalid cohort or intake month: " + cohort);
+        }
+
+        int offset = semesterIndex % semesterCycle.size();
+        return semesterCycle.get((startMonthIndex + offset) % semesterCycle.size());
+    }
+
+    /**
+     * Extracts the intake month from the cohort string.
+     */
+    private String extractIntakeMonthFromCohort() {
+        switch (cohort.substring(4, 6)) {
+            case "01":
+                return "January";
+            case "04":
+                return "March";
+            case "09":
+                return "August";
+            default:
+                throw new IllegalArgumentException("Unknown intake month in cohort: " + cohort);
         }
     }
 
+    /**
+     * Populates the required electives for this student (placeholder logic, replace with actual requirements).
+     */
+    private void populateRequiredElectives() {
+        // Placeholder electives based on semester or program requirements
+        this.requiredElectives.add("Elective1");
+        this.requiredElectives.add("Elective2");
+        this.requiredElectives.add("Elective3");
+        this.requiredElectives.add("Elective4");
+    }
+
+    /**
+     * Gets the required electives for the student.
+     */
+    public List<String> getRequiredElectives() {
+        return this.requiredElectives;
+    }
+
+    // ******** Existing Methods ******** //
+
     // Method to check if the student is on track
     public boolean isOnTrack(Map<String, List<Subject>> baseLineup) {
+        // Collect the subject codes of completed subjects
         Set<String> completedSubjectCodes = this.completedSubjects.stream()
                 .map(Subject::getSubjectCode)
                 .collect(Collectors.toSet());
+
         List<String> semesterKeys = new ArrayList<>(baseLineup.keySet());
+        Collections.sort(semesterKeys); // Ensure semesters are in the correct order
 
         // Iterate through all semesters prior to the current semester
-        for (int semesterIndex = 0; semesterIndex < getNumericCurrentSemester() - 1; semesterIndex++) {
+        for (int semesterIndex = 0; semesterIndex < currentSemester - 1; semesterIndex++) {
             String semesterKey = semesterKeys.get(semesterIndex);
             List<Subject> semesterSubjects = baseLineup.get(semesterKey);
 
@@ -53,28 +133,15 @@ public class Student {
                 // Ignore electives when checking progression
                 if (!subject.isElective() && !completedSubjectCodes.contains(subject.getSubjectCode())) {
                     System.out.println("[DEBUG] Missing Subject from Prior Semesters: " + subject.getSubjectCode());
-                    return false;
+                    return false; // Student is not on track
                 }
             }
         }
+
         return true; // Student is on track
     }
 
-    // Method to convert the current semester string to a numeric value for comparison
-    private int getNumericCurrentSemester() {
-        if (currentSemester == null || currentSemester.equalsIgnoreCase("Unknown")) {
-            return 1; // Default to semester 1 if unknown
-        }
-
-        try {
-            return Integer.parseInt(currentSemester.replaceAll("[^0-9]", ""));
-        } catch (NumberFormatException e) {
-            System.out.println("[ERROR] Failed to parse current semester: " + currentSemester + ". Defaulting to semester 1.");
-            return 1;
-        }
-    }
-
-    // Helper method to map the cohort to the programme lineup key
+    // Helper method to map the cohort to the program lineup key
     public String getCohortKey() {
         switch (cohort) {
             case "202401":
@@ -105,31 +172,7 @@ public class Student {
 
     // Getter for current semester
     public String getCurrentSemester() {
-        Map<String, List<Subject>> cohortPlan = LineupManager.getLineupForCohort(getCohortKey(), isInternational());
-        if (cohortPlan == null || cohortPlan.isEmpty()) {
-            return "Unknown";
-        }
-
-        int semesterIndex = 1; // Default semester 1
-        for (Map.Entry<String, List<Subject>> entry : cohortPlan.entrySet()) {
-            List<Subject> subjects = entry.getValue();
-
-            // Check if all subjects in the semester are completed
-            boolean completedAll = subjects.stream()
-                    .allMatch(subject -> completedSubjects.stream()
-                            .anyMatch(completed -> completed.getSubjectCode().equals(subject.getSubjectCode())));
-            if (completedAll) {
-                semesterIndex++;
-            } else {
-                break;
-            }
-        }
-
-        // Clamp semesterIndex to the valid range of semesters
-        int maxSemesters = cohortPlan.size();
-        semesterIndex = Math.min(semesterIndex, maxSemesters);
-
-        return "Semester " + semesterIndex;
+        return "Semester " + currentSemester; // Directly return the semester from the database
     }
 
     public List<Subject> getFailingSubjectsAsSubjects() {
@@ -138,7 +181,6 @@ public class Student {
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
-
 
     // ******** Getters ******** //
     public int getId() {
@@ -176,10 +218,6 @@ public class Student {
     // Setter for completed subjects
     public void setCompletedSubjects(List<Subject> completedSubjects) {
         this.completedSubjects = completedSubjects;
-    }
-
-    public void setCurrentSemester(String currentSemester) {
-        this.currentSemester = currentSemester;
     }
 
     // ******** String Representation ******** //
