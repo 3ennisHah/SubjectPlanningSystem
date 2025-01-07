@@ -28,8 +28,14 @@ public class ExcelExporter {
 
         // Create a header row
         Row headerRow = sheet.createRow(1);
-        headerRow.createCell(0).setCellValue("Semester");
-        headerRow.createCell(1).setCellValue("Subjects");
+
+        Cell semesterHeader = headerRow.createCell(0);
+        semesterHeader.setCellValue("Semester");
+        semesterHeader.setCellStyle(createHeaderCellStyle(workbook)); // Apply bold style
+
+        Cell subjectsHeader = headerRow.createCell(1);
+        subjectsHeader.setCellValue("Subjects");
+        subjectsHeader.setCellStyle(createHeaderCellStyle(workbook)); // Apply bold style
 
         // Populate the subject plan
         for (int i = 0; i < subjectPlan.size(); i++) {
@@ -60,6 +66,24 @@ public class ExcelExporter {
     private static CellStyle createTitleCellStyle(Workbook workbook) {
         Font font = workbook.createFont();
         font.setFontHeightInPoints((short) 16);
+        font.setBold(true);
+
+        CellStyle style = workbook.createCellStyle();
+        style.setFont(font);
+        style.setAlignment(HorizontalAlignment.CENTER);
+
+        return style;
+    }
+
+    /**
+     * Creates a header cell style for the Excel file.
+     *
+     * @param workbook The workbook where the style is applied
+     * @return A CellStyle object for the headers
+     */
+    private static CellStyle createHeaderCellStyle(Workbook workbook) {
+        Font font = workbook.createFont();
+        font.setFontHeightInPoints((short) 12);
         font.setBold(true);
 
         CellStyle style = workbook.createCellStyle();

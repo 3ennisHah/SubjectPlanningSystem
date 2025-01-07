@@ -54,7 +54,6 @@ public class FitnessFunction {
 
     private List<String> getRequiredCoreSubjects(Student student) {
         // Placeholder logic to retrieve required core subjects
-        // This should be replaced by actual logic to retrieve core subjects from LineupManager
-        return List.of("CSC1202", "CSC2103", "PRG2104"); // Example required core subjects
+        return List.of("CSC1202", "CSC2103", "PRG2104");
     }
 }

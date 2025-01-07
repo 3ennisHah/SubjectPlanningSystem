@@ -66,17 +66,35 @@ public class AuthenticationCheck {
                 return null; // Authentication failed
             }
         } else {
-            // Prompt for Admin password
+            // Admin authentication flow
             System.out.print("Enter password for Admin: ");
             String password = scanner.nextLine();
 
-            // Validate password
-            if (password.equals("admin")) {
-                System.out.println("Access granted. Welcome Admin!");
-                return role; // Successfully authenticated
-            } else {
+            // Validate Admin password first
+            if (!password.equals("admin")) {
                 System.out.println("Access denied! Invalid password.");
                 return null; // Authentication failed
+            }
+
+            System.out.println("Access granted. Welcome Admin!");
+
+            // Now allow Admin to fetch student data
+            while (true) {
+                try {
+                    System.out.print("Enter Student ID to fetch data: ");
+                    String adminInput = scanner.nextLine().trim();
+
+                    // Check if input is numeric
+                    if (adminInput.matches("\\d+")) {
+                        int adminStudentId = Integer.parseInt(adminInput);
+                        System.out.println("Processing request for Student ID: " + adminStudentId);
+                        return role; // Successfully authenticated admin
+                    } else {
+                        System.out.println("Invalid input. Please enter a numeric Student ID.");
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println("Invalid format. Please enter a valid numeric Student ID.");
+                }
             }
         }
     }

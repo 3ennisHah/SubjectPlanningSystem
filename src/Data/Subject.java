@@ -120,10 +120,10 @@ public class Subject {
     public static final Subject MPU3222 = new Subject("MPU3222", "Entrepreneurial Mindset and Skills", 2, new String[]{}, false, 2, false);
     public static final Subject SEG2202 = new Subject("SEG2202", "Software Engineering", 4, new String[]{"PRG1203"}, true, 2, false);
     public static final Subject MPU3412 = new Subject("MPU3412", "Community Service for Planetary Health", 2, new String[]{}, false, 2, false);
-    public static final Subject CSC2103 = new Subject("CSC2103", "Data Structure & Algorithms", 4, new String[]{"CSC1024"}, true, 2, false);
+    public static final Subject CSC2103 = new Subject("CSC2103", "Data Structure & Algorithms", 4, new String[]{"CSC1024"}, false, 2, false);
     public static final Subject CSC2014 = new Subject("CSC2014", "Digital Image Processing", 4, new String[]{}, true, 2, false);
     public static final Subject PRG2104 = new Subject("PRG2104", "Object-Oriented Programming", 4, new String[]{"PRG1203"}, true, 2, false);
-    public static final Subject ENG2044 = new Subject("ENG2044", "Communication Skills", 4, new String[]{}, false, 2, false);
+    public static final Subject ENG2044 = new Subject("ENG2044", "Communication Skills", 4, new String[]{}, true, 2, false);
     public static final Subject SEG3203 = new Subject("SEG3203", "Internship", 6, new String[]{"ENG2044"}, true, 3, false);
     public static final Subject CSC3206 = new Subject("CSC3206", "Artificial Intelligence", 4, new String[]{"CSC1024"}, true, 3, false);
     public static final Subject PRJ3213 = new Subject("PRJ3213", "Capstone Project 1", 3, new String[]{"ENG1044","PRG2104"}, true, 3, false);

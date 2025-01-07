@@ -90,11 +90,15 @@ public class Main {
                 SemesterHelper.displayPlan("Optimized Subject Plan", subjectPlan);
             }
 
-            // Export the subject plan to an Excel file
-            long excelStartTime = System.nanoTime(); // Start Excel export timing
-            exportToExcel(subjectPlan, student);
-            long excelEndTime = System.nanoTime(); // End Excel export timing
-            System.out.println("Excel export time: " + (excelEndTime - excelStartTime) / 1_000_000 + " ms");
+            // Only export to Excel if the user is an Admin
+            if (role.equals("Admin")) {
+                long excelStartTime = System.nanoTime(); // Start Excel export timing
+                exportToExcel(subjectPlan, student);
+                long excelEndTime = System.nanoTime(); // End Excel export timing
+                System.out.println("Excel export time: " + (excelEndTime - excelStartTime) / 1_000_000 + " ms");
+            } else {
+                System.out.println("[INFO] Excel export is only available for Admin users.");
+            }
 
             long endTime = System.nanoTime(); // End time for processing
             long durationInMillis = (endTime - startTime) / 1_000_000; // Convert to milliseconds
